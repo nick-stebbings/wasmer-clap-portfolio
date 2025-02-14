@@ -3,8 +3,7 @@ import "@xterm/xterm/css/xterm.css";
 import { Directory, type Instance } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-//@ts-expect-error
-import portfolioWasmUrl from "/project-cli/target/wasm32-wasip1/release/portfolio.wasm?url";
+import portfolioWasmUrl from "../../../project-cli/target/wasm32-wasip1/release/portfolio.wasm?url";
 
 const TERM_SETTINGS = {
   cursorBlink: true,
@@ -16,16 +15,16 @@ const TERM_SETTINGS = {
 };
 const TERM_PACKAGE = "sharrattj/bash";
 
-async function main() {
+export async function mountCLI(container: any) {
   const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
-
+console.log('container :>> ', container);
   await init();
   // initializeLogger("debug");
 
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
   term.loadAddon(fit);
-  term.open(document.getElementById("terminal")!);
+  term.open(container.querySelector("#terminal")!);
   fit.fit();
   term.writeln("Loading project CLI...");
 
@@ -73,8 +72,3 @@ function connectStreams(instance: Instance, term: Terminal): void {
     new WritableStream({ write: (chunk) => term.write(chunk) })
   );
 }
-
-// Start the application
-main().catch((error) => {
-  console.error("Application failed to start:", error);
-});
