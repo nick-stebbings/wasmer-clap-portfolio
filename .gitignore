@@ -1,0 +1,17 @@
+# -- Base
+.*
+!.gitignore
+node_modules/
+
+_*
+# '_' in src dir, ok.
+!**/src/**/_*
+
+*.lock
+*.lockb
+*.log
+
+# -- Rust
+target/
+# !Cargo.lock # Commented by default
+!.cargo/
