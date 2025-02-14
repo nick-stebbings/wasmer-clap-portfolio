@@ -10,5 +10,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['@wasmer/sdk']
-  }
+  },
+  assetsInclude: ['**/*.wasm']
 })
