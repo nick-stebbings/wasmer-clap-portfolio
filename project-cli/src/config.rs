@@ -14,10 +14,10 @@ pub fn config() -> &'static ProjectConfig {
 #[allow(unused)]
 #[derive(Deserialize, Clone)]
 pub struct ProjectConfig {
-    pub tab1_projects: Vec<Project>,
-    pub tab2_projects: Vec<Project>,
-    pub tab3_projects: Vec<Project>,
-    pub tab4_projects: Vec<Project>,
+    pub item1_projects: Vec<Project>,
+    pub item2_projects: Vec<Project>,
+    pub item3_projects: Vec<Project>,
+    pub item4_projects: Vec<Project>,
 }
 
 fn load_config() -> Result<ProjectConfig, config::ConfigError> {

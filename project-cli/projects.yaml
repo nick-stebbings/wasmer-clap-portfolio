@@ -1,4 +1,4 @@
-tab1_projects:
+item1_projects:
   - name: "Rust Game Engine"
     description: "A high-performance 2D game engine written in Rust"
     technologies: ["Rust", "OpenGL", "WGPU", "ECS"]
@@ -18,7 +18,7 @@ tab1_projects:
       - "Multi-cloud support"
       - "Async operations"
 
-tab2_projects:
+item2_projects:
   - name: "Web Assembly Framework"
     description: "Next-gen web framework using Rust and WASM"
     technologies: ["Rust", "WebAssembly", "JavaScript", "webpack"]
@@ -37,7 +37,7 @@ tab2_projects:
       - "Consistent replication"
       - "High throughput"
 
-tab3_projects:
+item3_projects:
   - name: "ML Pipeline Tool"
     description: "Machine learning pipeline orchestration tool"
     technologies: ["Rust", "Python", "TensorFlow", "Docker"]
@@ -56,7 +56,7 @@ tab3_projects:
       - "Real-time updates"
       - "Custom indexing"
 
-tab4_projects:
+item4_projects:
   - name: "IoT Platform"
     description: "Secure IoT device management platform"
     technologies: ["Rust", "MQTT", "embedded", "TLS"]
