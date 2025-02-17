@@ -12,7 +12,17 @@ export function App() {
     if (!existingTerminal) return;
     // Mount the WASM CLI app
     setTimeout(() => {
-      mountCLI((existingTerminal || container.current) as HTMLElement).catch((error) => {
+      mountCLI((existingTerminal || container.current) as HTMLElement).then(() => {
+        // Focus after CLI is mounted
+        const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
+        if (viewport) {
+          viewport.click();
+          const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement;
+          if (terminalElement) {
+            terminalElement.focus();
+          }
+        }
+      }).catch((error) => {
         console.error("Wasm CLI would not mount:", error);
       });
     }, 300);
