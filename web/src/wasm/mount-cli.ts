@@ -15,16 +15,48 @@ const TERM_SETTINGS = {
 };
 const TERM_PACKAGE = "sharrattj/bash";
 
-export async function mountCLI(container: any) {
-  const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
-console.log('container :>> ', container);
+export async function mountCLI(container: HTMLElement) {
+  const { Wasmer, init } = await import("@wasmer/sdk");
   await init();
-  // initializeLogger("debug");
-
+  
+    // Write projects.yaml to home directory
+    const projectsYaml = `
+    item1_projects:
+      - name: "Rust Game Engine"
+        description: "A high-performance 2D game engine written in Rust"
+        technologies: ["Rust", "OpenGL", "WGPU", "ECS"]
+        github_url: "https://github.com/user/rust-engine"
+        live_url: "https://rust-engine.dev"
+        highlights: 
+          - "60+ FPS performance"
+          - "Cross-platform support"
+          - "Modern shader pipeline"
+    item2_projects:
+      - name: "Another thing"
+        description: "A high-performance 2D game engine written in Rust"
+        technologies: ["Rust", "OpenGL", "WGPU", "ECS"]
+        github_url: "https://github.com/user/rust-engine"
+        live_url: "https://rust-engine.dev"
+        highlights: 
+          - "60+ FPS performance"
+          - "Cross-platform support"
+          - "Modern shader pipeline"
+    item3_projects:
+      - name: "yet Another thing"
+        description: "A high-performance 2D game engine written in Rust"
+        technologies: ["Rust", "OpenGL", "WGPU", "ECS"]
+        github_url: "https://github.com/user/rust-engine"
+        live_url: "https://rust-engine.dev"
+        highlights: 
+          - "60+ FPS performance"
+          - "Cross-platform support"
+          - "Modern shader pipeline"
+    `;
+    
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
   term.loadAddon(fit);
-  term.open(container.querySelector("#terminal")!);
+  term.open(container);
   fit.fit();
   term.writeln("Loading project CLI...");
 
@@ -35,14 +67,15 @@ console.log('container :>> ', container);
 
   term.reset();
   const home = new Directory();
-
+  await home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml));
+  
   // Create a bin directory for our commands
   const bin = new Directory();
 
-  await bin.writeFile("/show", portfolioWasmBinary);
+  await bin.writeFile("/projects-cli", portfolioWasmBinary);
 
   const instance = await pkg.entrypoint!.run({
-    args: [],
+    args: ["-c", "/usr/local/bin/projects-cli"],
     uses: [],
     mount: { "/home": home, "/usr/local/bin": bin },
     cwd: "/home",
@@ -50,6 +83,7 @@ console.log('container :>> ', container);
       TERM: "xterm-256color",
       HOME: "/home",
       PATH: "/usr/local/bin:/usr/bin:/bin",
+      PS1: "Guest> ",
     },
   });
   connectStreams(instance, term);

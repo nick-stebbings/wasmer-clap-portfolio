@@ -1,22 +1,22 @@
-import { useEffect, useRef } from 'preact/hooks'
 import './app.css'
+import { useEffect } from 'preact/hooks'
 import { mountCLI } from './wasm/mount-cli';
 
-export function App() {
-  const container = useRef(null)
+const MONITOR_ELEMENT_CLASS = 'framer-14kpxdk';
 
+export function App() {
   useEffect(() => {
-    if (container.current == null) return;
+    const existingTerminal = document.querySelector(`.${MONITOR_ELEMENT_CLASS}`);
+    if (!existingTerminal) return;
     // Mount the WASM CLI app
-    mountCLI(container.current).catch((error) => {
-      console.error("Wasm CLI would not mount:", error);
-    });
+    setTimeout(() => {
+      mountCLI((existingTerminal) as HTMLElement).catch((error) => {
+        console.error("Wasm CLI would not mount:", error);
+      });
+    }, 300);
   }, [])
 
   return (
-    <div ref={container}>
-
-      <div id="terminal"></div>
-    </div>
+    <div id="terminal"></div>
   )
 }
