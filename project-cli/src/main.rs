@@ -1,12 +1,12 @@
 use clap::Parser;
-use project::Project;
+use colored::*;
 use config::config;
 use std::{
     fmt::Display,
     io::{self, Read, Write},
 };
-mod project;
 mod config;
+mod project;
 
 #[derive(Parser)]
 struct Cli {
@@ -27,11 +27,11 @@ struct MenuItem {
 
 impl Display for MenuList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\x1B[H=== {} ===\n", self.title)?;
+        writeln!(f, "{}\n", format!("=== {} ===", self.title).cyan().bold())?;
         for item in &self.items {
-            write!(f, "\n{} {}", item.number, item.text)?;
+            writeln!(f, "{} {}", item.number.to_string().cyan(), item.text)?;
         }
-        write!(f, "\n\n{}", self.prompt)?;
+        writeln!(f, "\n{}", self.prompt.dimmed())?;
         Ok(())
     }
 }
@@ -95,14 +95,26 @@ fn quit() -> ! {
 
 fn show_menu() {
     clear_screen();
-    
+
     let menu = MenuList {
         title: "Portfolio Projects".into(),
         items: vec![
-            MenuItem { number: '➊', text: "Rust Projects".into() },
-            MenuItem { number: '➋', text: "Web Projects".into() },
-            MenuItem { number: '➌', text: "ML & Blockchain".into() },
-            MenuItem { number: '➍', text: "IoT & Systems".into() },
+            MenuItem {
+                number: '➊',
+                text: "Rust Projects".into(),
+            },
+            MenuItem {
+                number: '➋',
+                text: "Web Projects".into(),
+            },
+            MenuItem {
+                number: '➌',
+                text: "ML & Blockchain".into(),
+            },
+            MenuItem {
+                number: '➍',
+                text: "IoT & Systems".into(),
+            },
         ],
         prompt: "Press 1-4 to view category, q to quit",
     };
@@ -120,7 +132,7 @@ fn show_menu() {
 
 fn show_projects(category: u8) {
     clear_screen();
-    
+
     let projects = match category {
         1 => &config().item1_projects,
         2 => &config().item2_projects,
@@ -130,12 +142,14 @@ fn show_projects(category: u8) {
     };
 
     let title = format!("Category {} Projects", category);
-    let menu_items = projects.iter().enumerate().map(|(i, p)| {
-        MenuItem {
+    let menu_items = projects
+        .iter()
+        .enumerate()
+        .map(|(i, p)| MenuItem {
             number: char::from_digit((i + 1) as u32, 10).unwrap_or('1'),
             text: p.name.clone(),
-        }
-    }).collect();
+        })
+        .collect();
 
     let projects_menu = MenuList {
         title,
@@ -157,7 +171,7 @@ fn show_projects(category: u8) {
 
 fn show_project_detail(category: u8, project_idx: usize) {
     clear_screen();
-    
+
     let projects = match category {
         1 => &config().item1_projects,
         2 => &config().item2_projects,

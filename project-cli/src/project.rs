@@ -1,5 +1,6 @@
 // src/project.rs
 
+use colored::*;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -15,26 +16,37 @@ pub struct Project {
 
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "=== {} ===\n", self.name)?;
-        writeln!(f, "Description:")?;
+        writeln!(f, "{}\n", format!("=== {} ===", self.name).cyan().bold())?;
+
+        writeln!(f, "{}", "Description:".yellow().bold())?;
         writeln!(f, "{}\n", self.description)?;
 
-        writeln!(f, "Technologies:")?;
-        writeln!(f, "{}\n", self.technologies.join(", "))?;
+        writeln!(f, "{}", "Technologies:".yellow().bold())?;
+        writeln!(f, "{}\n", self.technologies.join(", ").blue())?;
 
         if let Some(url) = &self.github_url {
-            writeln!(f, "GitHub: {}", url)?;
+            writeln!(
+                f,
+                "{} {}",
+                "GitHub:".yellow().bold(),
+                url.blue().underline()
+            )?;
         }
         if let Some(url) = &self.live_url {
-            writeln!(f, "Live URL: {}", url)?;
+            writeln!(
+                f,
+                "{} {}",
+                "Live URL:".yellow().bold(),
+                url.blue().underline()
+            )?;
         }
 
-        writeln!(f, "\nHighlights:")?;
+        writeln!(f, "\n{}", "Highlights:".yellow().bold())?;
         for highlight in &self.highlights {
-            writeln!(f, "➊ {}", highlight)?;
+            writeln!(f, "{} {}", "➊".cyan(), highlight)?;
         }
 
-        writeln!(f, "\nPress b for menu, q to quit")?;
+        writeln!(f, "\n{}", "Press b for menu, q to quit".dimmed())?;
         Ok(())
     }
 }
