@@ -3,7 +3,7 @@ import "@xterm/xterm/css/xterm.css";
 import { Directory, type Instance } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-import portfolioWasmUrl from "../../../project-cli/target/wasm32-wasip1/release/portfolio.wasm?url";
+import portfolioWasmUrl from "/portfolio.wasm?url";
 
 const TERM_SETTINGS = {
   cursorBlink: true,
@@ -16,11 +16,8 @@ const TERM_SETTINGS = {
 const TERM_PACKAGE = "sharrattj/bash";
 
 export async function mountCLI(container: HTMLElement) {
-  const { Wasmer, init } = await import("@wasmer/sdk");
-  await init();
-  
-    // Write projects.yaml to home directory
-    const projectsYaml = `
+  // Write projects.yaml to home directory
+  const projectsYaml = `
     item1_projects:
       - name: "Rust Game Engine"
         description: "A high-performance 2D game engine written in Rust"
@@ -52,41 +49,79 @@ export async function mountCLI(container: HTMLElement) {
           - "Cross-platform support"
           - "Modern shader pipeline"
     `;
-    
-  const term = new Terminal(TERM_SETTINGS);
-  const fit = new FitAddon();
-  term.loadAddon(fit);
-  term.open(container);
-  fit.fit();
-  term.writeln("Loading project CLI...");
-
-  const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
-  const portfolioWasmBinary = await fetch(portfolioWasmUrl)
-    .then((response) => response.arrayBuffer())
-    .then((buffer) => new Uint8Array(buffer));
-
-  term.reset();
-  const home = new Directory();
-  await home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml));
+    if (!container) return;
   
-  // Create a bin directory for our commands
-  const bin = new Directory();
-
-  await bin.writeFile("/projects-cli", portfolioWasmBinary);
-
-  const instance = await pkg.entrypoint!.run({
-    args: ["-c", "/usr/local/bin/projects-cli"],
-    uses: [],
-    mount: { "/home": home, "/usr/local/bin": bin },
-    cwd: "/home",
-    env: {
-      TERM: "xterm-256color",
-      HOME: "/home",
-      PATH: "/usr/local/bin:/usr/bin:/bin",
-      PS1: "Guest> ",
-    },
-  });
-  connectStreams(instance, term);
+    const term = new Terminal(TERM_SETTINGS);
+    const fit = new FitAddon();
+    term.writeln("Welcome to my portfolio CLI!");
+    
+    try {
+      const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
+      term.writeln("Loading...");
+      await init().catch(e => {
+        console.error("Wasmer init failed:", e);
+        return;
+      });
+      initializeLogger('warn');
+      term.loadAddon(fit);
+      term.open(container);
+      fit.fit();
+      
+      const pkg = await Wasmer.fromRegistry(TERM_PACKAGE).catch(e => {
+        throw new Error(`Failed to load bash package: ${e.message}`);
+      });
+  
+      const portfolioWasmBinary = await fetch(portfolioWasmUrl, {
+        headers: { 
+          'Accept': 'application/wasm',
+          'Content-Type': 'application/wasm'
+        }
+      }).then(async r => {
+        if (!r.ok) {
+          console.error('WASM fetch response:', r);
+          throw new Error(`Failed to fetch WASM: ${r.status}`);
+        }
+        return new Uint8Array(await r.arrayBuffer());
+      }).catch(e => {
+        console.error('WASM fetch error:', e);
+        throw e;
+      });
+  
+      const home = new Directory();
+      const bin = new Directory();
+      try {
+        await Promise.all([
+          home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
+          bin.writeFile("projects", portfolioWasmBinary)
+        ]);      
+      } catch (e) {
+        console.error('Bash write error:', e);
+        throw e;
+      }
+      const instance = await pkg.entrypoint?.run({
+        args: ["-c", "/usr/local/bin/projects"],
+        uses: [],
+        mount: { 
+          "/home": home, 
+          "/usr/local/bin": bin 
+        },
+        cwd: "/home",
+        env: {
+          TERM: "xterm-256color",
+          HOME: "/home",
+          PATH: "/usr/local/bin:/usr/bin:/bin",
+          PS1: "Guest> ",
+        },
+      });
+  
+      if (!instance) throw new Error("Failed to create WASM instance");
+      connectStreams(instance, term);
+  
+    } catch (error) {
+      console.error("CLI mount error:", error);
+      //@ts-expect-error
+      term.writeln(`\x1b[31mError: ${error.message}\x1b[0m`);
+    }
 }
 
 /**

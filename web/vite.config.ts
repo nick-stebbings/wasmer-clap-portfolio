@@ -11,8 +11,21 @@ export default defineConfig({
       'Cross-Origin-Resource-Policy': 'cross-origin'
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+      },
+      output: {
+        entryFileNames: 'assets/[name].mjs',
+        chunkFileNames: 'assets/[name].mjs',
+        assetFileNames: 'assets/[name].[ext]',
+      },
+    },
+    manifest: true,
+  },
   optimizeDeps: {
     exclude: ['@wasmer/sdk']
   },
-  assetsInclude: ['**/*.wasm']
+  assetsInclude: ['**/*.wasm'],
 })
