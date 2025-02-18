@@ -14,27 +14,38 @@ struct Cli {
     command: String,
 }
 
-struct MenuList {
-    title: String,
-    items: Vec<MenuItem>,
-    prompt: &'static str,
+pub struct MenuList {
+    pub title: String,
+    pub items: Vec<MenuItem>,
+    pub prompt: &'static str,
 }
 
-struct MenuItem {
-    number: char,
-    text: String,
+pub struct MenuItem {
+    pub number: char,
+    pub text: String,
 }
 
 impl Display for MenuList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}\n", format!("=== {} ===", self.title).cyan().bold())?;
+        
         for item in &self.items {
             writeln!(f, "{} {}", item.number.to_string().cyan(), item.text)?;
         }
-        writeln!(f, "\n{}", self.prompt.dimmed())?;
+        
+        // Construct prompt with explicit white commands
+        let prompt = format!("Press {}{} to view a category, {} to quit", 
+            "1-".white().bold(), 
+            (self.items.len().to_string()).white().bold(), 
+            "q".white().bold()
+        );
+        
+        writeln!(f, "\n{}", prompt)?;
+        writeln!(f, "{}", "Press ENTER after each choice!".yellow().italic())?;
         Ok(())
     }
 }
+
 
 fn main() {
     enable_raw_mode();
@@ -101,22 +112,14 @@ fn show_menu() {
         items: vec![
             MenuItem {
                 number: '➊',
-                text: "Rust Projects".into(),
+                text: "Front End Projects".into(),
             },
             MenuItem {
                 number: '➋',
-                text: "Web Projects".into(),
-            },
-            MenuItem {
-                number: '➌',
-                text: "ML & Blockchain".into(),
-            },
-            MenuItem {
-                number: '➍',
-                text: "IoT & Systems".into(),
+                text: "Back End Projects".into(),
             },
         ],
-        prompt: "Press 1-4 to view category, q to quit",
+        prompt: "Press 1 or 2 to view category, q to quit",
     };
 
     print!("{}", menu);
@@ -124,7 +127,11 @@ fn show_menu() {
 
     let choice = get_single_char();
     match choice {
-        '1'..='4' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
+        '1' => {
+            print!("\x1B]1337;Custom=1\x07");
+            io::stdout().flush().unwrap();
+        }
+        '2'..='4' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
         'q' => quit(),
         _ => show_menu(),
     }
