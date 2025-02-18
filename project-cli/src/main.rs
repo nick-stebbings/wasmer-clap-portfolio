@@ -1,23 +1,12 @@
-use clap::Parser;
 use colored::*;
 use config::config;
-use std::{
-    fmt::Display,
-    io::{self, Read, Write},
-};
+use std::io::{self, Read, Write};
 mod config;
 mod project;
-
-#[derive(Parser)]
-struct Cli {
-    #[arg(default_value = "menu")]
-    command: String,
-}
 
 pub struct MenuList {
     pub title: String,
     pub items: Vec<MenuItem>,
-    pub prompt: &'static str,
 }
 
 pub struct MenuItem {
@@ -25,7 +14,7 @@ pub struct MenuItem {
     pub text: String,
 }
 
-impl Display for MenuList {
+impl std::fmt::Display for MenuList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}\n", format!("=== {} ===", self.title).cyan().bold())?;
         
@@ -33,53 +22,33 @@ impl Display for MenuList {
             writeln!(f, "{} {}", item.number.to_string().cyan(), item.text)?;
         }
         
-        // Construct prompt with explicit white commands
-        let prompt = format!("Press {}{} to view a category, {} to quit", 
-            "1-".white().bold(), 
-            (self.items.len().to_string()).white().bold(), 
+        // Use explicit white() for commands
+        let prompt = format!("Press {} to view category, {} to quit", 
+            "1-4".white().bold(), 
             "q".white().bold()
         );
         
-        writeln!(f, "\n{}", prompt)?;
+        writeln!(f, "\n{}", prompt.bright_black())?;
         writeln!(f, "{}", "Press ENTER after each choice!".yellow().italic())?;
         Ok(())
     }
 }
 
-
 fn main() {
     enable_raw_mode();
-
-    let cli = Cli::parse();
-    match cli.command.as_str() {
-        "menu" => show_menu(),
-        "1" | "2" | "3" | "4" => show_projects(cli.command.parse().unwrap_or(1)),
-        _ => show_menu(),
-    }
-
+    show_menu();
     cleanup();
     disable_raw_mode();
 }
-fn enable_raw_mode() {
-    print!("\x1B[?1049h"); // Use alternate screen buffer
-    print!("\x1B[2J"); // Clear screen
-    print!("\x1B[H"); // Move cursor to home position
-    io::stdout().flush().unwrap();
 
-    let _ = std::process::Command::new("stty")
-        .arg("raw")
-        .arg("-echo")
-        .spawn();
+fn enable_raw_mode() {
+    print!("\x1B[?1049h\x1B[2J\x1B[H");
+    io::stdout().flush().unwrap();
 }
 
 fn disable_raw_mode() {
-    print!("\x1B[?1049l"); // Restore main screen buffer
+    print!("\x1B[?1049l");
     io::stdout().flush().unwrap();
-
-    let _ = std::process::Command::new("stty")
-        .arg("-raw")
-        .arg("echo")
-        .spawn();
 }
 
 fn clear_screen() {
@@ -105,21 +74,18 @@ fn quit() -> ! {
 }
 
 fn show_menu() {
-    clear_screen();
-
     let menu = MenuList {
         title: "Portfolio Projects".into(),
         items: vec![
             MenuItem {
-                number: '➊',
+                number: '1',
                 text: "Front End Projects".into(),
             },
             MenuItem {
-                number: '➋',
+                number: '2',
                 text: "Back End Projects".into(),
             },
         ],
-        prompt: "Press 1 or 2 to view category, q to quit",
     };
 
     print!("{}", menu);
@@ -128,8 +94,10 @@ fn show_menu() {
     let choice = get_single_char();
     match choice {
         '1' => {
+            // Send custom escape sequence to be handled by front-end
             print!("\x1B]1337;Custom=1\x07");
             io::stdout().flush().unwrap();
+            show_menu();
         }
         '2'..='4' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
         'q' => quit(),
@@ -143,8 +111,6 @@ fn show_projects(category: u8) {
     let projects = match category {
         1 => &config().item1_projects,
         2 => &config().item2_projects,
-        3 => &config().item3_projects,
-        4 => &config().item4_projects,
         _ => &config().item1_projects,
     };
 
@@ -161,7 +127,6 @@ fn show_projects(category: u8) {
     let projects_menu = MenuList {
         title,
         items: menu_items,
-        prompt: "Press 1-3 to view details, b for menu, q to quit",
     };
 
     print!("{}", projects_menu);

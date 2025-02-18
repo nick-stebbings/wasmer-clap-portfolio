@@ -10,8 +10,7 @@ pub struct Project {
     pub description: String,
     pub technologies: Vec<String>,
     pub github_url: Option<String>,
-    pub live_url: Option<String>,
-    pub highlights: Vec<String>,
+    pub clients: Vec<String>,
 }
 
 impl fmt::Display for Project {
@@ -27,12 +26,9 @@ impl fmt::Display for Project {
         if let Some(url) = &self.github_url {
             writeln!(f, "{} {}", "GitHub:".yellow().bold(), url.blue().underline())?;
         }
-        if let Some(url) = &self.live_url {
-            writeln!(f, "{} {}", "Live URL:".yellow().bold(), url.blue().underline())?;
-        }
-        
+
         writeln!(f, "\n{}", "Highlights:".yellow().bold())?;
-        for highlight in &self.highlights {
+        for highlight in &self.clients {
             writeln!(f, "{} {}", "➊".cyan(), highlight)?;
         }
         
@@ -41,7 +37,7 @@ impl fmt::Display for Project {
             .replace("b", "b".white().to_string().as_str())
             .replace("q", "q".white().to_string().as_str());
             
-        writeln!(f, "\n{}", prompt.dimmed())?;
+        writeln!(f, "\n{}", prompt.bright_black())?;
         writeln!(f, "{}", "Press ENTER after each choice!".yellow().italic())?;
         Ok(())
     }

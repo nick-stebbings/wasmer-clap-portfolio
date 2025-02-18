@@ -1,6 +1,8 @@
 // src/config.rs
 use crate::project::Project;
 use serde::Deserialize;
+
+#[cfg(not(target_arch = "wasm32"))]
 use std::sync::OnceLock;
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -26,6 +28,7 @@ pub struct ProjectConfig {
     pub item4_projects: Vec<Project>,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn load_config() -> Result<ProjectConfig, config::ConfigError> {
     let projects = config::Config::builder()
         .add_source(config::File::new("projects.yaml", config::FileFormat::Yaml))
