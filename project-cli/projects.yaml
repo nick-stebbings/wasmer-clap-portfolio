@@ -1,76 +1,53 @@
 item1_projects:
-  - name: "Rust Game Engine"
-    description: "A high-performance 2D game engine written in Rust"
-    technologies: ["Rust", "OpenGL", "WGPU", "ECS"]
-    github_url: "https://github.com/user/rust-engine"
-    live_url: "https://rust-engine.dev"
-    highlights: 
-      - "60+ FPS performance"
-      - "Cross-platform support"
-      - "Modern shader pipeline"
-
-  - name: "Cloud Native CLI"
-    description: "Command-line tool for managing cloud infrastructure"
-    technologies: ["Rust", "AWS SDK", "Clap", "Tokio"]
-    github_url: "https://github.com/user/cloud-cli"
-    live_url: null
-    highlights: 
-      - "Multi-cloud support"
-      - "Async operations"
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    clients: 
+      - "Stub Client"
 
 item2_projects:
-  - name: "Web Assembly Framework"
-    description: "Next-gen web framework using Rust and WASM"
-    technologies: ["Rust", "WebAssembly", "JavaScript", "webpack"]
-    github_url: "https://github.com/user/wasm-framework"
-    live_url: "https://wasm-framework.io"
-    highlights: 
-      - "Near-native performance"
-      - "Seamless JS integration"
+  - name: "Node APIs"
+    description: "I've contributed multiple times to RESTful APIs using JS/TypeScript that were deployed to production applications."
+    technologies: ["Express.js", "Node.js", "Bun", "Caprover", "Docker"]
+    clients: 
+      - "Inkibra Ltd. (Freelance)"
+      - "Whites Powersports AU/NZ (at Y5 Labs)"
 
-  - name: "Distributed Database"
-    description: "Highly available distributed KV store"
-    technologies: ["Rust", "Raft", "gRPC", "RocksDB"]
-    github_url: "https://github.com/user/dist-db"
-    live_url: null
-    highlights: 
-      - "Consistent replication"
-      - "High throughput"
+  - name: "Rust peer-to-peer APIs"
+    description: "Writing and unit testing Holochain dApp endpoints"
+    technologies: ["Rust", "Holochain", "Tryorama (testing)"]
+    github_url: "https://github.com/HabFract/planitt/tree/main/tests"
+    clients: 
+      - "Neighbourhoods"
+      - "Planitt (Side Project)"
+
+  - name: "Ruby APIs"
+    description: "Writing a RESTful API for personal habit data"
+    technologies: ["Sinatra", "dry-rb", "Rack frameworks"]
+    github_url: "https://github.com/nick-stebbings/fractal-habit-pyramid-sinatraAPI"
+    clients: 
+      - "Habit/Fract v1 (Side Project)"
+
+  - name: "Zero Knowledge Proofs"
+    description: "Studying Rust implementations of ZKPs"
+    technologies: ["ZKP", "artworks-rs", "Elliptic curve cryptography", "Blockchain L2 Rollups"]
+    github_url: "https://github.com/nick-stebbings/zkp"
+    clients: 
+      - "None.. yet ;)"
 
 item3_projects:
-  - name: "ML Pipeline Tool"
-    description: "Machine learning pipeline orchestration tool"
-    technologies: ["Rust", "Python", "TensorFlow", "Docker"]
-    github_url: "https://github.com/user/ml-pipe"
-    live_url: "https://ml-pipe.dev"
-    highlights: 
-      - "GPU acceleration"
-      - "Distributed training"
-
-  - name: "Blockchain Explorer"
-    description: "Fast blockchain data indexer and API"
-    technologies: ["Rust", "PostgreSQL", "GraphQL", "Redis"]
-    github_url: "https://github.com/user/block-explorer"
-    live_url: "https://block-explorer.io"
-    highlights: 
-      - "Real-time updates"
-      - "Custom indexing"
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    clients: 
+      - "Stub Client"
 
 item4_projects:
-  - name: "IoT Platform"
-    description: "Secure IoT device management platform"
-    technologies: ["Rust", "MQTT", "embedded", "TLS"]
-    github_url: "https://github.com/user/iot-platform"
-    live_url: null
-    highlights: 
-      - "End-to-end encryption"
-      - "Low latency"
-
-  - name: "System Monitor"
-    description: "Advanced system monitoring and diagnostics"
-    technologies: ["Rust", "eBPF", "WebSocket", "Prometheus"]
-    github_url: "https://github.com/user/sys-monitor"
-    live_url: "https://sys-monitor.dev"
-    highlights: 
-      - "Low overhead"
-      - "Custom metrics"
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    clients: 
+      - "Stub Client"
