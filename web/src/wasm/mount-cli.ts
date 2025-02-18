@@ -15,8 +15,8 @@ const TERM_SETTINGS = {
 };
 const TERM_PACKAGE = "sharrattj/bash";
 
-export async function mountCLI(container: HTMLElement) {
-  // Write projects.yaml to home directory
+export async function mountCLI(container: HTMLElement, scrollToFrontend: () => void) {
+  // Write projects.yaml to home directory (needed for local)
   const projectsYaml = `
     item1_projects:
       - name: "Rust Game Engine"
@@ -122,22 +122,36 @@ export async function mountCLI(container: HTMLElement) {
       //@ts-expect-error
       term.writeln(`\x1b[31mError: ${error.message}\x1b[0m`);
     }
+
+    /**
+     * Connects terminal streams to the Wasmer instance
+     */
+    function connectStreams(instance: Instance, term: Terminal): void {
+      const encoder = new TextEncoder();
+      const stdin = instance.stdin?.getWriter();
+    
+      term.onData((data) => stdin?.write(encoder.encode(data)));
+    
+      const decoder = new TextDecoder();
+      
+      instance.stdout.pipeTo(
+        new WritableStream({
+          write(chunk) {
+            const text = decoder.decode(chunk);
+            // Check for our special escape sequence
+            if (text.includes('\x1B]1337;Custom=1\x07')) {
+              scrollToFrontend()
+              return;
+            }
+    
+            term.write(chunk);
+          }
+        })
+      );
+    
+      instance.stderr.pipeTo(
+        new WritableStream({ write: (chunk) => term.write(chunk) })
+      );
+    }
 }
 
-/**
- * Connects terminal streams to the Wasmer instance
- */
-function connectStreams(instance: Instance, term: Terminal): void {
-  const encoder = new TextEncoder();
-  const stdin = instance.stdin?.getWriter();
-
-  term.onData((data) => stdin?.write(encoder.encode(data)));
-
-  instance.stdout.pipeTo(
-    new WritableStream({ write: (chunk) => term.write(chunk) })
-  );
-
-  instance.stderr.pipeTo(
-    new WritableStream({ write: (chunk) => term.write(chunk) })
-  );
-}

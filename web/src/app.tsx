@@ -12,7 +12,7 @@ export function App() {
     if (!existingTerminal) return;
     // Mount the WASM CLI app
     setTimeout(() => {
-      mountCLI((existingTerminal || container.current) as HTMLElement).then(() => {
+      mountCLI(existingTerminal as HTMLElement, () => (window.location.hash = 'work') ).then(() => {
         // Focus after CLI is mounted
         const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
         if (viewport) {
