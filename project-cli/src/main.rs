@@ -88,6 +88,7 @@ fn show_menu() {
         ],
     };
 
+    print!("{}[2J", 27 as char);
     print!("{}", menu);
     io::stdout().flush().unwrap();
 
