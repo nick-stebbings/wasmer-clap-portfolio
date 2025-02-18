@@ -16,3 +16,7 @@ config = "0.15.8"
 anyhow = "1.0"
 colored = "3.0.0"
 serde_yaml = "0.9.34"
+
+[profile.release]
+lto = true
+opt-level = 'z'
