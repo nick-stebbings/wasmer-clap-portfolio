@@ -1,3 +1,19 @@
 #app {
   height: 0;
 }
+
+.framer-XTjJ3 {
+  overflow: hidden !important;
+}
+
+.xterm-viewport {
+  background-color: rgb(8, 24, 34) !important;
+}
+
+.terminal {
+  ::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+    background: rgb(8, 24, 34);
+  }
+}
