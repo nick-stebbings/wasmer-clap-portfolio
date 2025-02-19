@@ -1,32 +1,45 @@
-import { useEffect, useRef } from 'preact/hooks'
-// import './wasm/terminal.css'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import './app.css'
 import { mountCLI } from './wasm/mount-cli';
 
-export function App() {
-  const container = useRef(null)
+if (import.meta.env.PROD) console.log = console.warn = console.error = () => {};
 
+export function App() {
+  const container = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
   const monitorElementClass = 'framer-14kpxdk';
+
   useEffect(() => {
-    const existingTerminal = document.querySelector(`.${monitorElementClass}`);
-    if (!existingTerminal) return;
-    // Mount the WASM CLI app
-    setTimeout(() => {
-      mountCLI(existingTerminal as HTMLElement, () => (window.location.hash = 'work') ).then(() => {
-        // Focus after CLI is mounted
+    let intervalId;
+    const checkAndMountCLI = () => {
+      const existingTerminal = document.querySelector(`.${monitorElementClass}`);
+      if (!existingTerminal || isMounted) return;
+
+      mountCLI(existingTerminal as HTMLElement, () => {
+        window.location.hash = 'work';
+      })
+      .then(() => {
         const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
         if (viewport) {
           viewport.click();
-          const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLTextAreaElement;
+          const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLElement;
           if (terminalElement) {
             terminalElement.focus();
           }
         }
-      }).catch((error) => {
+        setIsMounted(true);
+      })
+      .catch((error) => {
         console.error("Wasm CLI would not mount:", error);
+        setIsMounted(true);
       });
-    }, 3000);
-  }, [])
+    };
+
+    intervalId = setInterval(checkAndMountCLI, 500);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [isMounted]);
 
   return (
     <div ref={container}>

@@ -58,16 +58,24 @@
 
     <!-- Kept core scripts needed for functionality -->
     <script>
-      (()=>{function u(){function n(t,e,i){let r=document.createElement("a");r.href=t,r.target=i,r.rel=e,document.body.appendChild(r),r.click(),r.remove()}function o(t){if(this.dataset.hydrated){this.removeEventListener("click",o);return}t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");if(!e)return;if(/Mac|iPod|iPhone|iPad/u.test(navigator.userAgent)?t.metaKey:t.ctrlKey)return n(e,"","_blank");let r=this.getAttribute("rel")??"",c=this.getAttribute("target")??"";n(e,r,c)}function a(t){if(this.dataset.hydrated){this.removeEventListener("auxclick",o);return}t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");e&&n(e,"","_blank")}function s(t){if(this.dataset.hydrated){this.removeEventListener("keydown",s);return}if(t.key!=="Enter")return;t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");if(!e)return;let i=this.getAttribute("rel")??"",r=this.getAttribute("target")??"";n(e,i,r)}document.querySelectorAll("[data-nested-link]").forEach(t=>{t instanceof HTMLElement&&(t.addEventListener("click",o),t.addEventListener("auxclick",a),t.addEventListener("keydown",s))})}return u})()()
+      try {
+        (()=>{function u(){function n(t,e,i){let r=document.createElement("a");r.href=t,r.target=i,r.rel=e,document.body.appendChild(r),r.click(),r.remove()}function o(t){if(this.dataset.hydrated){this.removeEventListener("click",o);return}t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");if(!e)return;if(/Mac|iPod|iPhone|iPad/u.test(navigator.userAgent)?t.metaKey:t.ctrlKey)return n(e,"","_blank");let r=this.getAttribute("rel")??"",c=this.getAttribute("target")??"";n(e,r,c)}function a(t){if(this.dataset.hydrated){this.removeEventListener("auxclick",o);return}t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");e&&n(e,"","_blank")}function s(t){if(this.dataset.hydrated){this.removeEventListener("keydown",s);return}if(t.key!=="Enter")return;t.preventDefault(),t.stopPropagation();let e=this.getAttribute("href");if(!e)return;let i=this.getAttribute("rel")??"",r=this.getAttribute("target")??"";n(e,i,r)}document.querySelectorAll("[data-nested-link]").forEach(t=>{t instanceof HTMLElement&&(t.addEventListener("click",o),t.addEventListener("auxclick",a),t.addEventListener("keydown",s))})}return u})()()
+      } catch (error) {
+        
+      }
     </script>
 
     <!-- Kept appear animations scripts since they seem core to functionality -->
     <script>
-      (()=>{function i(){for(let e of document.querySelectorAll("[data-framer-original-sizes]")){let t=e.getAttribute("data-framer-original-sizes");t===""?e.removeAttribute("sizes"):e.setAttribute("sizes",t),e.removeAttribute("data-framer-original-sizes")}}function a(){window.__framer_onRewriteBreakpoints=i}return a})()()
+      try {
+        (()=>{function i(){for(let e of document.querySelectorAll("[data-framer-original-sizes]")){let t=e.getAttribute("data-framer-original-sizes");t===""?e.removeAttribute("sizes"):e.setAttribute("sizes",t),e.removeAttribute("data-framer-original-sizes")}}function a(){window.__framer_onRewriteBreakpoints=i}return a})()()
+      } catch (error) {
+        
+      }
     </script>
 
     <!-- Kept core module scripts -->
-    <script type="module" async data-framer-bundle="main" src="https://framerusercontent.com/sites/6XqVl9tC5eG8Gc8iN0TytW/script_main.2OXFG2BE.mjs"></script>
+    <script type="module" onerror="throw('An error occurred')" async data-framer-bundle="main" src="https://framerusercontent.com/sites/6XqVl9tC5eG8Gc8iN0TytW/script_main.2OXFG2BE.mjs"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
@@ -79,14 +87,13 @@
                 const parentElement = mediumFeedElement.parentElement;
                 
                 if (parentElement) {
-                    // Create a new div element with the specified class and data attribute
+                    // Create a new div element with the specified class for Common Ninja
                     const newDiv = document.createElement('div');
-                    newDiv.className = 'sk-ww-medium-publication-feed';
-                    newDiv.setAttribute('data-embed-id', '25525169');
+                    newDiv.className = 'commonninja_component pid-6d47c262-27bb-4e79-b407-3f35ac2d3760';
                     
-                    // Create a new script element
+                    // Create a new script element for Common Ninja
                     const script = document.createElement('script');
-                    script.src = "https://widgets.sociablekit.com/medium-publication-feed/widget.js";
+                    script.src = "https://cdn.commoninja.com/sdk/latest/commonninja.js";
                     script.defer = true;
                     
                     // Append the new div and script to the parent element

@@ -6,9 +6,19 @@ export default defineConfig({
   plugins: [preact()],
   server: {
     headers: {
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Embedder-Policy': 'cross-site',
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Resource-Policy': 'cross-origin'
+    },
+
+    host: '0.0.0.0',
+    port: 5175,
+    cors: {
+        origin: 'http://localhost',
+        credentials: true,
+    },
+    hmr: {
+        host: 'localhost',
     },
   },
   build: {

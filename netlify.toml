@@ -6,7 +6,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Embedder-Policy = "cross-site"
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "cross-origin"
 
