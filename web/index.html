@@ -33,7 +33,7 @@
 
       @font-face{
         src: url('/pockota.otf') format('opentype');
-        font-weight: 300;        /* 300 for Light */
+        font-weight: 300;
         font-display: swap;font-family:Pockota Medium;
         font-display:swap
       }
@@ -55,7 +55,7 @@
       <template></template>
       <div hidden></div>
     </div>
-
+    <script src="/commoninja-sdk.js" defer></script>
     <!-- Kept core scripts needed for functionality -->
     <script>
       try {
@@ -83,25 +83,46 @@
             const mediumFeedElement = document.getElementById('medium-feed');
             
             if (mediumFeedElement) {
-                // Get the parent element of 'medium-feed'
-                const parentElement = mediumFeedElement.parentElement;
-                
-                if (parentElement) {
-                    // Create a new div element with the specified class for Common Ninja
-                    const newDiv = document.createElement('div');
-                    newDiv.className = 'commonninja_component pid-6d47c262-27bb-4e79-b407-3f35ac2d3760';
-                    
-                    // Create a new script element for Common Ninja
-                    const script = document.createElement('script');
-                    script.src = "https://cdn.commoninja.com/sdk/latest/commonninja.js";
-                    script.defer = true;
-                    
-                    // Append the new div and script to the parent element
-                    parentElement.appendChild(newDiv);
-                    parentElement.appendChild(script);
-                }
+              // Get the parent element of 'medium-feed'
+              const parentElement = mediumFeedElement.parentElement;
+              
+              if (parentElement) {
+                  // Create a new div element with the specified class and pid
+                  const newDiv = document.createElement('div');
+                  newDiv.className = 'commonninja_component';
+                  newDiv.setAttribute('pid', '6d47c262-27bb-4e79-b407-3f35ac2d3760');
+                  
+                  // Append the new div and script to the parent element
+                  parentElement.appendChild(newDiv);
+              }
             }
           }, 1000);
+          setTimeout(() => {
+            // Hack to fix Framer mistake in the positioning of this element.
+              const sourceElement = document.querySelector('.framer-1fgvh5a');
+              const targetContainer = document.querySelector('.framer-17xv2t1');
+              if (sourceElement && targetContainer) {
+                  const clone = sourceElement.cloneNode(true);
+                  targetContainer.appendChild(clone);
+                  sourceElement.remove();
+                  console.log('Element cloned and appended successfully');
+              } else {
+                  console.log('Could not find source or target elements');
+              }
+          }, 1000); 
+          setTimeout(() => {
+            // Hack to fix Framer mistake in the positioning of this element.
+              const sourceElement = document.querySelector('.framer-12ep12m');
+              const targetContainer = document.querySelector('.framer-kd0ghb');
+              if (sourceElement && targetContainer) {
+                  const clone = sourceElement.cloneNode(true);
+                  targetContainer.appendChild(clone);
+                  sourceElement.remove();
+                  console.log('Element cloned and appended successfully');
+              } else {
+                  console.log('Could not find source or target elements');
+              }
+          }, 1000); 
         });
     </script>
     <!-- Kept minimal SVG templates that are referenced -->
@@ -129,8 +150,6 @@
     </div>
 
     <div id="app"></div>
-    <div class="commonninja_component pid-6d47c262-27bb-4e79-b407-3f35ac2d3760"></div>
     <script type="module" src="/src/main.tsx"></script>
-
   </body>
 </html>

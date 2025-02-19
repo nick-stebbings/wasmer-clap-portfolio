@@ -15,6 +15,35 @@ const TERM_SETTINGS = {
 };
 const TERM_PACKAGE = "sharrattj/bash";
 
+class TerminalSingleton {
+  terminal?: typeof Terminal.prototype | null;
+  static instance: TerminalSingleton;
+
+  constructor() {
+      if (!TerminalSingleton.instance) {
+          this.terminal = null;
+          TerminalSingleton.instance = this;
+      }
+      return TerminalSingleton.instance;
+  }
+
+  getInstance() {
+      if (!this.terminal) {
+          this.terminal = new Terminal(); // Replace with your terminal initialization
+      }
+      return this.terminal;
+  }
+
+  open(containerId: string) {
+      if (this.terminal) {
+          this.terminal.open(document.getElementById(containerId) as HTMLElement);
+      }
+  }
+}
+
+const instance = new TerminalSingleton();
+Object.freeze(instance);
+
 export async function mountCLI(
   container: HTMLElement,
   scrollToFrontend: () => void
@@ -75,12 +104,12 @@ export async function mountCLI(
       highlights: 
         - "Stub Client"
   `;
-  if (!container) return;
+  if(!container) return;
 
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
   term.writeln("Welcome to my portfolio CLI!");
-
+  term.attachCustomWheelEventHandler((_ev: WheelEvent) => false);
   try {
     const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
     term.writeln("Loading...");

@@ -17,17 +17,18 @@ pub struct MenuItem {
 impl std::fmt::Display for MenuList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}\n", format!("=== {} ===", self.title).cyan().bold())?;
-        
+
         for item in &self.items {
             writeln!(f, "{} {}", item.number.to_string().cyan(), item.text)?;
         }
-        
+
         // Use explicit white() for commands
-        let prompt = format!("Press {} to view category, {} to quit", 
-            "1-4".white().bold(), 
+        let prompt = format!(
+            "Press {} to view category, {} to quit",
+            "1-4".white().bold(),
             "q".white().bold()
         );
-        
+
         writeln!(f, "\n{}", prompt.bright_black())?;
         writeln!(f, "{}", "Press ENTER after each choice!".yellow().italic())?;
         Ok(())

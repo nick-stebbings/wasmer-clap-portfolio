@@ -2,14 +2,6 @@
   height: 0;
 }
 
-.framer-XTjJ3 {
-  overflow: hidden !important;
-}
-
-.framer-1vdvt3y {
-  padding-bottom: 16px !important;
-}
-
 .xterm-viewport {
   background-color: rgb(8, 24, 34) !important;
 }
@@ -19,5 +11,83 @@
     height: 12px;
     width: 12px;
     background: rgb(8, 24, 34);
+  }
+}
+.terminal.xterm:not(:last-child) {
+  display: none;
+}
+
+.xterm-rows, .xterm-rows > div:not(:has(.xterm-cursor)) {
+  pointer-events: none;
+}
+
+/* The following are CSS hotfixes for bugs that occurred due to 'jail-break'ing the Framer side with a no-code to html tool */
+/* I acknowledge this is terrible practice and promise not to do it again :') */
+.framer-TPyLz {
+  width: calc(100vw - 32px) !important;
+}
+
+.framer-1vdvt3y {
+  padding-bottom: 16px !important;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* TEMP: need to fix embedded cross-site issue */
+#medium {
+  height: 0 !important;
+}
+
+@media only screen and (min-width: 768px) {
+  .framer-XTjJ3 {
+    overflow: hidden !important;
+  }
+  /* Card tech labels */
+  .framer-1f6tag0 p span {
+    font-size: 22px !important;
+  }
+  /* Card tech labels */
+  .framer-1it751k p span, .framer-60fbyx p span {
+    font-size: 17px !important;
+  }
+  .framer-1o0ec7y {
+    margin-top: 16px;
+  }
+  .framer-1013ucp, .framer-d7bz4t {
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Section heights/padding */
+  #bio .framer-wktgsy-container { padding-top: 96px; };
+  #blog { padding-top: 256px; }
+  .framer-VLQog .framer-1vfmt6w,
+  .framer-VLQog .framer-1rczswb {
+    height: initial !important;  
+  }
+  .framer-VLQog .framer-1vfmt6w {
+    min-height: 100vh;
+  }
+
+  /* Testimonial padding */
+  .framer-1o0ec7y, .framer-1o0ec7y {
+    margin-top: 16px;
+  }
+
+  /* CTA button overflow */
+  .framer-VLQog .framer-241gsz {
+    gap: 4px !important;
+    padding: 12px 8px 12px !important;
+  }
+
+  /* Card tech labels */
+  .framer-1f6tag0 p span {
+    font-size: 17px !important;
+  }
+  .framer-hgz8pz {    
+    margin-bottom: 8px;
   }
 }

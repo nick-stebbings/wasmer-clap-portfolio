@@ -16,13 +16,13 @@ pub struct Project {
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "{}\n", format!("=== {} ===", self.name).cyan().bold())?;
-        
+
         writeln!(f, "{}", "Description:".white().bold())?;
         writeln!(f, "{}\n", self.description)?;
-        
+
         writeln!(f, "{}", "Technologies:".white().bold())?;
         writeln!(f, "{}\n", self.technologies.join(", ").blue())?;
-        
+
         if let Some(url) = &self.github_url {
             writeln!(f, "{} {}", "GitHub:".white().bold(), url.blue().underline())?;
         }
@@ -31,13 +31,14 @@ impl fmt::Display for Project {
         for highlight in &self.clients {
             writeln!(f, "{} {}", "➊".cyan(), highlight)?;
         }
-        
+
         // Split prompt to highlight commands
-        let prompt = format!("Press {} for menu, {} to quit",
+        let prompt = format!(
+            "Press {} for menu, {} to quit",
             "b".white().bold(),
             "q".white().bold(),
         );
-            
+
         writeln!(f, "\n{}", prompt.bright_black())?;
         writeln!(f, "{}", "Press ENTER after each choice!".yellow().italic())?;
         Ok(())
