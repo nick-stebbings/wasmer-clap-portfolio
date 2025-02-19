@@ -21,7 +21,7 @@ export async function mountCLI(
 ) {
   // Write projects.yaml to home directory (needed for local)
   const projectsYaml = `
-  item1_projects:
+  item2_projects:
     - name: "FrontEnd stub"
       description: "FrontEnd stub"
       technologies: ["FrontEnd stub"]
@@ -29,9 +29,9 @@ export async function mountCLI(
       highlights: 
         - "Stub Client"
   
-  item2_projects:
+  item1_projects:
     - name: "Node APIs"
-      description: "I've contributed multiple times to RESTful APIs using JS/TypeScript that were deployed to production applications."
+      description: "I've contributed multiple times to RESTful APIs using JS / TypeScript that were deployed to production applications."
       technologies: ["Express.js", "Node.js", "Bun", "Caprover", "Docker"]
       highlights: 
         - "Inkibra Ltd. (Freelance)"

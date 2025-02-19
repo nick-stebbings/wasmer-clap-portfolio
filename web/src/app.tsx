@@ -25,7 +25,7 @@ export function App() {
       }).catch((error) => {
         console.error("Wasm CLI would not mount:", error);
       });
-    }, 300);
+    }, 1000);
   }, [])
 
   return (
