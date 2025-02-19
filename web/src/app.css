@@ -21,3 +21,6 @@
     background: rgb(8, 24, 34);
   }
 }
+.terminal.xterm:not(:last-child) {
+  display: none;
+}
