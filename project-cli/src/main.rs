@@ -79,11 +79,11 @@ fn show_menu() {
         items: vec![
             MenuItem {
                 number: '1',
-                text: "Front End Projects".into(),
+                text: "Back End Projects".into(),
             },
             MenuItem {
                 number: '2',
-                text: "Back End Projects".into(),
+                text: "Front End Projects".into(),
             },
         ],
     };
@@ -94,13 +94,13 @@ fn show_menu() {
 
     let choice = get_single_char();
     match choice {
-        '1' => {
+        '1' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
+        '2' => {
             // Send custom escape sequence to be handled by front-end
             print!("\x1B]1337;Custom=1\x07");
             io::stdout().flush().unwrap();
             show_menu();
         }
-        '2'..='4' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
         'q' => quit(),
         _ => show_menu(),
     }
@@ -135,7 +135,7 @@ fn show_projects(category: u8) {
 
     let choice = get_single_char();
     match choice {
-        '1'..='3' => show_project_detail(category, choice.to_digit(10).unwrap_or(1) as usize),
+        '1'..='4' => show_project_detail(category, choice.to_digit(10).unwrap_or(1) as usize),
         'b' => show_menu(),
         'q' => quit(),
         _ => show_projects(category),
