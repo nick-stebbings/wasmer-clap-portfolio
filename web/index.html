@@ -83,23 +83,21 @@
             const mediumFeedElement = document.getElementById('medium-feed');
             
             if (mediumFeedElement) {
-                // Get the parent element of 'medium-feed'
-                const parentElement = mediumFeedElement.parentElement;
-                
-                if (parentElement) {
-                    // Create a new div element with the specified class for Common Ninja
-                    const newDiv = document.createElement('div');
-                    newDiv.className = 'commonninja_component pid-6d47c262-27bb-4e79-b407-3f35ac2d3760';
-                    
-                    // Create a new script element for Common Ninja
-                    const script = document.createElement('script');
-                    script.src = "https://cdn.commoninja.com/sdk/latest/commonninja.js";
-                    script.defer = true;
-                    
-                    // Append the new div and script to the parent element
-                    parentElement.appendChild(newDiv);
-                    parentElement.appendChild(script);
-                }
+              // Get the parent element of 'medium-feed'
+              const parentElement = mediumFeedElement.parentElement;
+              
+              if (parentElement) {
+                  // Create a new iframe element
+                  const iframe = document.createElement('iframe');
+                  iframe.src = "https://widgets.commoninja.com/iframe/6d47c262-27bb-4e79-b407-3f35ac2d3760";
+                  iframe.width = "100%";
+                  iframe.height = "100%";
+                  iframe.frameBorder = "0";
+                  iframe.scrolling = "no";
+                  
+                  // Append the iframe to the parent element
+                  parentElement.appendChild(iframe);
+              }
             }
           }, 1000);
         });
