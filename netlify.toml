@@ -6,7 +6,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Embedder-Policy = "cross-site"
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "cross-origin"
 
@@ -15,18 +15,11 @@
   [headers.values]
     Content-Type = "application/wasm"
     Content-Disposition = "attachment; filename=portfolio.wasm"
+    Cross-Origin-Embedder-Policy = "require-corp"
 
 [[headers]]
   for = "/assets/*.wasm"
   [headers.values]
     Content-Type = "application/wasm"
     Content-Disposition = "attachment; filename=portfolio.wasm"
-[[headers]]
-  for = "/*.mjs"
-  [headers.values]
-    Content-Type = "text/javascript"
-
-[[headers]]
-  for = "/assets/*.mjs"
-  [headers.values]
-    Content-Type = "text/javascript"
+    Cross-Origin-Embedder-Policy = "require-corp"
