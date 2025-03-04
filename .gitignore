@@ -2,10 +2,8 @@
 .*
 !.gitignore
 node_modules/
+!/**/_redirects
 
-_*
-# '_' in src dir, ok.
-!**/src/**/_*
 
 *.lock
 *.lockb

@@ -123,6 +123,16 @@
                   console.log('Could not find source or target elements');
               }
           }, 1000); 
+          setTimeout(() => {
+              // Find and update resume link
+              const resumeLinks = document.querySelectorAll('*[href="https://nickstebbings.com/assets/resume.b20eb635.pdf"]');
+                if (resumeLinks[0]) {
+                  resumeLinks[0]?.setAttribute("href", 'http://bit.ly/4bthbDF');
+                  resumeLinks[0].onClick = () => window.location.href = "http://bit.ly/4bthbDF"
+                } else {
+                  console.log('Could not find source or target elements');
+                }
+          }, 1000); 
         });
     </script>
     <!-- Kept minimal SVG templates that are referenced -->
