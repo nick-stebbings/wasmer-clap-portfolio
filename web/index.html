@@ -76,14 +76,6 @@
     <!-- Kept core module scripts -->
     <script type="module" onerror="throw('An error occurred')" async data-framer-bundle="main" src="https://framerusercontent.com/sites/6XqVl9tC5eG8Gc8iN0TytW/script_main.2OXFG2BE.mjs"></script>
     <script>
-        window.addEventListener('message', function(e) {
-            if (e.data.type === 'mediumFeedHeight') {
-                const iframe = document.getElementById('medium-feed-frame');
-                if (iframe) {
-                    iframe.style.height = `${e.data.height}px`;
-                }
-            }
-        });
         document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
             // Find the element with the ID 'medium-feed'
