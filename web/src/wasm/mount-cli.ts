@@ -72,6 +72,7 @@ export async function mountCLI(
       github_url: "https://github.com/HabFract/planitt/tree/main/tests"
       highlights: 
         - "Neighbourhoods"
+        - "zkCATS"
         - "Planitt (Side Project)"
   
     - name: "Ruby APIs"
@@ -84,7 +85,7 @@ export async function mountCLI(
     - name: "Zero Knowledge Proofs"
       description: "Studying Rust implementations of ZKPs"
       technologies: ["ZKP", "artworks-rs", "Elliptic curve cryptography", "Blockchain L2 Rollups"]
-      github_url: "https://github.com/nick-stebbings/zkp"
+      github_url: "https://github.com/nick-stebbings/zkCATS"
       highlights: 
         - "None.. yet ;)"
   

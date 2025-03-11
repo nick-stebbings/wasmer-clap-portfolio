@@ -32,7 +32,7 @@ item1_projects:
   - name: "Zero Knowledge Proofs"
     description: "Studying Rust implementations of ZKPs"
     technologies: ["ZKP", "artworks-rs", "Elliptic curve cryptography", "Blockchain L2 Rollups"]
-    github_url: "https://github.com/nick-stebbings/zkp"
+    github_url: "https://github.com/nick-stebbings/zkCATS"
     clients: 
       - "None.. yet ;)"
 

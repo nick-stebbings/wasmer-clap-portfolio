@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medium Feed</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="commonninja_component pid-6d47c262-27bb-4e79-b407-3f35ac2d3760"></div>
+    <script>
+        // Add this after the CommonNinja script
+        const sendHeight = () => {
+            const height = document.body.scrollHeight;
+            window.parent.postMessage({ type: 'mediumFeedHeight', height }, '*');
+        };
+        
+        // Send height after content loads
+        window.addEventListener('load', () => {
+            setTimeout(sendHeight, 1000); // Give CommonNinja time to render
+        });
+        
+        // Optional: Periodically check for height changes
+        setInterval(sendHeight, 2000);
+    </script>
+    <script defer src="https://cdn.commoninja.com/sdk/latest/commonninja.js"></script>
+</body>
+</html>

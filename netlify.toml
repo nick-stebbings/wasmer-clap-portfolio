@@ -1,29 +1,24 @@
-[build]
-  base = "web"
-  command = "pnpm run build"
-  publish = "dist"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Cross-Origin-Embedder-Policy = "require-corp"
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Resource-Policy = "cross-origin"
-
 [[headers]]
   for = "/*.wasm"
   [headers.values]
     Content-Type = "application/wasm"
     Content-Disposition = "attachment; filename=portfolio.wasm"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "same-site"
 
 [[headers]]
-  for = "/assets/*.wasm"
+  for = "/medium-feed.html"
   [headers.values]
-    Content-Type = "application/wasm"
-    Content-Disposition = "attachment; filename=portfolio.wasm"
+    Cross-Origin-Embedder-Policy = "unsafe-none"
+    Cross-Origin-Opener-Policy = "unsafe-none"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
+    Content-Security-Policy = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
 
 [[headers]]
-  for = "/index.html"
+  for = "/*"
   [headers.values]
-    Cross-Origin-Embedder-Policy = "cross-site"
-    Content-Security-Policy = "frame-ancestors https://widgets.commoninja.com"
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "cross-origin"

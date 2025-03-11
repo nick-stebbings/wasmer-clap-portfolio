@@ -55,7 +55,6 @@
       <template></template>
       <div hidden></div>
     </div>
-    <script src="/commoninja-sdk.js" defer></script>
     <!-- Kept core scripts needed for functionality -->
     <script>
       try {
@@ -77,26 +76,48 @@
     <!-- Kept core module scripts -->
     <script type="module" onerror="throw('An error occurred')" async data-framer-bundle="main" src="https://framerusercontent.com/sites/6XqVl9tC5eG8Gc8iN0TytW/script_main.2OXFG2BE.mjs"></script>
     <script>
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'mediumFeedHeight') {
+                const iframe = document.getElementById('medium-feed-frame');
+                if (iframe) {
+                    iframe.style.height = `${e.data.height}px`;
+                }
+            }
+        });
         document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => {
             // Find the element with the ID 'medium-feed'
             const mediumFeedElement = document.getElementById('medium-feed');
             
             if (mediumFeedElement) {
-              // Get the parent element of 'medium-feed'
-              const parentElement = mediumFeedElement.parentElement;
-              
-              if (parentElement) {
-                  // Create a new div element with the specified class and pid
-                  const newDiv = document.createElement('div');
-                  newDiv.className = 'commonninja_component';
-                  newDiv.setAttribute('pid', '6d47c262-27bb-4e79-b407-3f35ac2d3760');
+                // Get the parent element of 'medium-feed'
+                const parentElement = mediumFeedElement.parentElement;
+                
+                if (parentElement) {
+                  const iframe = document.createElement('iframe');
+                  iframe.id = 'medium-feed-frame';
+                  iframe.src = '/medium-feed.html';
+                  iframe.style.width = '100%';
+                  iframe.style.border = 'none';
+                  iframe.style.height = '800px';
+                  iframe.loading = 'lazy';
+
+                  // Replace the medium-feed element with the iframe
+                  mediumFeedElement.replaceWith(iframe);
                   
-                  // Append the new div and script to the parent element
-                  parentElement.appendChild(newDiv);
-              }
+                  // Add the resize listener
+                  window.addEventListener('message', function(e) {
+                      if (e.data.type === 'mediumFeedHeight' && e.origin === window.location.origin) {
+                          const feedFrame = document.getElementById('medium-feed-frame');
+                          if (feedFrame) {
+                              feedFrame.style.height = `${e.data.height}px`;
+                          }
+                      }
+                  });
+                }
             }
           }, 1000);
+
           setTimeout(() => {
             // Hack to fix Framer mistake in the positioning of this element.
               const sourceElement = document.querySelector('.framer-1fgvh5a');
@@ -122,17 +143,7 @@
               } else {
                   console.log('Could not find source or target elements');
               }
-          }, 1000); 
-          setTimeout(() => {
-              // Find and update resume link
-              const resumeLinks = document.querySelectorAll('*[href="https://nickstebbings.com/assets/resume.b20eb635.pdf"]');
-                if (resumeLinks[0]) {
-                  resumeLinks[0]?.setAttribute("href", 'http://bit.ly/4bthbDF');
-                  resumeLinks[0].onClick = () => window.location.href = "http://bit.ly/4bthbDF"
-                } else {
-                  console.log('Could not find source or target elements');
-                }
-          }, 1000); 
+          }, 1000);
         });
     </script>
     <!-- Kept minimal SVG templates that are referenced -->
