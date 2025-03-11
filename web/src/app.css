@@ -35,11 +35,6 @@ body {
   overflow-x: hidden;
 }
 
-/* TEMP: need to fix embedded cross-site issue */
-#medium {
-  height: 0 !important;
-}
-
 .framer-MSLi4 {
   opacity: 1 !important;
 }
