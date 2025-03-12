@@ -39,6 +39,10 @@ body {
   opacity: 1 !important;
 }
 
+#contact-2 {
+  z-index: 0 !important;
+}
+
 /* Resume button hint */
 .framer-xfv7qn-container:first-child .framer-x2hwk::after {
   content: "↑ Resume";
