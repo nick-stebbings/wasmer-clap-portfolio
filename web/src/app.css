@@ -39,6 +39,19 @@ body {
   opacity: 1 !important;
 }
 
+/* Resume button hint */
+.framer-xfv7qn-container:first-child .framer-x2hwk::after {
+  content: "↑ Resume";
+  display: block;
+  color: white;
+  font-size: 0.8rem;
+  margin-top: 6px;
+  text-align: center;
+  top: 42px;
+  position: relative;
+  left: -5px;
+}
+
 @media only screen and (min-width: 768px) {
   .framer-XTjJ3 {
     overflow: hidden !important;
