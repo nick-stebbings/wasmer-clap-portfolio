@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import './app.css'
 import { mountCLI } from './wasm/mount-cli';
 
-if (import.meta.env.PROD) console.log = console.warn = console.error = () => {};
+// if (import.meta.env.PROD) console.log = console.warn = console.error = () => {};
 
 export function App() {
   const container = useRef(null);
@@ -18,7 +18,7 @@ export function App() {
       mountCLI(existingTerminal as HTMLElement, () => {
         window.location.hash = 'work';
       })
-      .then(() => {
+      .then((cleanup) => {
         const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
         if (viewport) {
           viewport.click();
@@ -28,6 +28,10 @@ export function App() {
           }
         }
         setIsMounted(true);
+        if(!cleanup || typeof cleanup !== 'function') {
+          console.error("Could not cleanup");
+        }
+        cleanup!()
       })
       .catch((error) => {
         console.error("Wasm CLI would not mount:", error);

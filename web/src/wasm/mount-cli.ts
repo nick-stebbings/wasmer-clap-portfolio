@@ -15,6 +15,8 @@ const TERM_SETTINGS = {
 };
 const TERM_PACKAGE = "sharrattj/bash";
 
+let wasmerInitialized = false;
+
 class TerminalSingleton {
   terminal?: typeof Terminal.prototype | null;
   static instance: TerminalSingleton;
@@ -105,58 +107,57 @@ export async function mountCLI(
       highlights: 
         - "Stub Client"
   `;
-  if(!container) return;
+  if (!container) return;
 
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
-  term.writeln("Welcome to my portfolio CLI!");
+  term.writeln("Welcome to my portfolio command line!");
   term.attachCustomWheelEventHandler((_ev: WheelEvent) => false);
-  try {
-    const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
-    term.writeln("Loading...");
-    await init().catch((e) => {
-      console.error("Wasmer init failed:", e);
-      return;
-    });
-    initializeLogger("warn");
-    term.loadAddon(fit);
-    term.open(container);
-    fit.fit();
 
-    const pkg = await Wasmer.fromRegistry(TERM_PACKAGE).catch((e) => {
-      throw new Error(`Failed to load bash package: ${e.message}`);
-    });
+  // Initialize terminal first
+  term.loadAddon(fit);
+  term.open(container);
+  fit.fit();
+
+  let cleanup: (() => void) | null = null;
+  let wasmerInstance: Instance | undefined;
+
+  if (!wasmerInitialized) {
+    try {
+      const { init } = await import("@wasmer/sdk");
+      await init();
+      wasmerInitialized = true;
+    } catch (e) {
+      console.error("Wasmer init failed:", e);
+      term.writeln(`\x1b[31mFailed to initialize Wasmer: ${e.message}\x1b[0m`);
+      return;
+    }
+  }
+  try {
+    term.writeln("Loading...");
+    const { Wasmer } = await import("@wasmer/sdk");
+    const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
+    if (!pkg) throw new Error("Failed to load bash package");
 
     const portfolioWasmBinary = await fetch(portfolioWasmUrl, {
       headers: {
         Accept: "application/wasm",
         "Content-Type": "application/wasm",
       },
-    })
-      .then(async (r) => {
-        if (!r.ok) {
-          console.error("WASM fetch response:", r);
-          throw new Error(`Failed to fetch WASM: ${r.status}`);
-        }
-        return new Uint8Array(await r.arrayBuffer());
-      })
-      .catch((e) => {
-        console.error("WASM fetch error:", e);
-        throw e;
-      });
+    }).then(r => {
+      if (!r.ok) throw new Error(`Failed to fetch WASM: ${r.status}`);
+      return r.arrayBuffer();
+    }).then(buffer => new Uint8Array(buffer));
 
     const home = new Directory();
     const bin = new Directory();
-    try {
-      await Promise.all([
-        home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
-        bin.writeFile("projects", portfolioWasmBinary),
-      ]);
-    } catch (e) {
-      console.error("Bash write error:", e);
-      throw e;
-    }
-    const instance = await pkg.entrypoint?.run({
+    
+    await Promise.all([
+      home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
+      bin.writeFile("projects", portfolioWasmBinary),
+    ]);
+
+    wasmerInstance = await pkg.entrypoint?.run({
       args: ["-c", "/usr/local/bin/projects"],
       uses: [],
       mount: {
@@ -172,8 +173,24 @@ export async function mountCLI(
       },
     });
 
-    if (!instance) throw new Error("Failed to create WASM instance");
-    connectStreams(instance, term);
+    if (!wasmerInstance) throw new Error("Failed to create WASM instance");
+
+    cleanup = connectStreams(wasmerInstance, term);
+
+    return () => {
+      try {
+        if (cleanup) {
+          cleanup();
+          cleanup = null;
+        }
+        if (wasmerInstance) {
+          wasmerInstance = undefined;
+        }
+        term.dispose();
+      } catch (e) {
+        console.error("Cleanup error:", e);
+      }
+    };
   } catch (error) {
     console.error("CLI mount error:", error);
     //@ts-expect-error
@@ -183,31 +200,95 @@ export async function mountCLI(
   /**
    * Connects terminal streams to the Wasmer instance
    */
-  function connectStreams(instance: Instance, term: Terminal): void {
+  function connectStreams(instance: Instance, term: Terminal) : () => void {
     const encoder = new TextEncoder();
-    const stdin = instance.stdin?.getWriter();
-
-    term.onData((data) => stdin?.write(encoder.encode(data)));
-
     const decoder = new TextDecoder();
-
-    instance.stdout.pipeTo(
-      new WritableStream({
-        write(chunk) {
-          const text = decoder.decode(chunk);
-          // Check for our special escape sequence
-          if (text.includes("\x1B]1337;Custom=1\x07")) {
-            scrollToFrontend();
-            return;
+    
+    // Create a single writer and keep it alive
+    const stdinWriter = instance.stdin?.getWriter();
+    let isDisposed = false;
+  
+    const dataDisposable = term.onData((data: string) => {
+      if (!isDisposed && stdinWriter) {
+        try {
+          stdinWriter.write(encoder.encode(data));
+        } catch (e) {
+          console.error('Write error:', e);
+        }
+      }
+    });
+  
+    // Create persistent stream handlers
+    let stdoutController: AbortController | null = new AbortController();
+    let stderrController: AbortController | null = new AbortController();
+  
+    // Handle stdout with abort signal
+    (async () => {
+      try {
+        while (!isDisposed) {
+          const reader = instance.stdout.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done || isDisposed) break;
+              
+              const text = decoder.decode(value);
+              if (text.includes("\x1B]1337;Custom=1\x07")) {
+                scrollToFrontend();
+                continue;
+              }
+              term.write(value);
+            }
+          } finally {
+            reader.releaseLock();
           }
-
-          term.write(chunk);
-        },
-      })
-    );
-
-    instance.stderr.pipeTo(
-      new WritableStream({ write: (chunk) => term.write(chunk) })
-    );
+        }
+      } catch (e) {
+        console.error('Stdout error:', e);
+      }
+    })();
+  
+    // Handle stderr with abort signal
+    (async () => {
+      try {
+        while (!isDisposed) {
+          const reader = instance.stderr.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done || isDisposed) break;
+              term.write(value);
+            }
+          } finally {
+            reader.releaseLock();
+          }
+        }
+      } catch (e) {
+        console.error('Stderr error:', e);
+      }
+    })();
+  
+    return () => {
+      isDisposed = true;
+      dataDisposable.dispose();
+      
+      if (stdinWriter) {
+        try {
+          stdinWriter.releaseLock();
+        } catch (e) {
+          console.error('Stdin cleanup error:', e);
+        }
+      }
+  
+      if (stdoutController) {
+        stdoutController.abort();
+        stdoutController = null;
+      }
+  
+      if (stderrController) {
+        stderrController.abort();
+        stderrController = null;
+      }
+    };
   }
 }
