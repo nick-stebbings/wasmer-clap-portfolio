@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'preact/hooks'
 import './app.css'
 import { mountCLI } from './wasm/mount-cli';
 
-// if (import.meta.env.PROD) console.log = console.warn = console.error = () => {};
+if (import.meta.env.PROD) console.log = console.warn = console.error = () => {};
 
 export function App() {
   const container = useRef(null);
