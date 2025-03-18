@@ -22,29 +22,32 @@ class TerminalSingleton {
   static instance: TerminalSingleton;
 
   constructor() {
-      if (!TerminalSingleton.instance) {
-          this.terminal = null;
-          TerminalSingleton.instance = this;
-      }
-      return TerminalSingleton.instance;
+    if (!TerminalSingleton.instance) {
+      this.terminal = null;
+      TerminalSingleton.instance = this;
+    }
+    return TerminalSingleton.instance;
   }
 
   getInstance() {
-      if (!this.terminal) {
-          this.terminal = new Terminal(); // Replace with your terminal initialization
-      }
-      return this.terminal;
+    if (!this.terminal) {
+      this.terminal = new Terminal(); // Replace with your terminal initialization
+    }
+    return this.terminal;
   }
 
   open(containerId: string) {
-      if (this.terminal) {
-          this.terminal.open(document.getElementById(containerId) as HTMLElement);
-      }
+    if (this.terminal) {
+      this.terminal.open(document.getElementById(containerId) as HTMLElement);
+    }
   }
 }
 
 const instance = new TerminalSingleton();
 Object.freeze(instance);
+
+// Check for mobile device
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 export async function mountCLI(
   container: HTMLElement,
@@ -111,7 +114,7 @@ export async function mountCLI(
 
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
-  term.writeln("Welcome to my portfolio command line!");
+  term.writeln("Welcome to my portfolio terminal!");
   term.attachCustomWheelEventHandler((_ev: WheelEvent) => false);
 
   // Initialize terminal first
@@ -123,13 +126,36 @@ export async function mountCLI(
   let wasmerInstance: Instance | undefined;
 
   if (!wasmerInitialized) {
+    term.writeln("Initializing...");
+
     try {
-      const { init } = await import("@wasmer/sdk");
-      await init();
+      const initPromise = import("@wasmer/sdk").then(({ init }) => {
+        term.writeln("Loading WASM runtime...");
+        return init();
+      });
+
+      // Set timeout especially for mobile
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () => reject(new Error("Loading timeout")),
+          isMobile ? 15000 : 5000
+        );
+      });
+
+      await Promise.race([initPromise, timeoutPromise]).catch((e) => {
+        if (e.message === "Loading timeout") {
+          throw new Error(
+            "Loading timed out. Please try on desktop, or check your connection."
+          );
+        }
+        throw e;
+      });
       wasmerInitialized = true;
     } catch (e) {
       console.error("Wasmer init failed:", e);
-      term.writeln(`\x1b[31mFailed to initialize Wasmer: ${(e as any).message}\x1b[0m`);
+      term.writeln(
+        `\x1b[31mFailed to initialize Wasmer: ${(e as any).message}\x1b[0m`
+      );
       return;
     }
   }
@@ -144,14 +170,16 @@ export async function mountCLI(
         Accept: "application/wasm",
         "Content-Type": "application/wasm",
       },
-    }).then(r => {
-      if (!r.ok) throw new Error(`Failed to fetch WASM: ${r.status}`);
-      return r.arrayBuffer();
-    }).then(buffer => new Uint8Array(buffer));
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error(`Failed to fetch WASM: ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .then((buffer) => new Uint8Array(buffer));
 
     const home = new Directory();
     const bin = new Directory();
-    
+
     await Promise.all([
       home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
       bin.writeFile("projects", portfolioWasmBinary),
@@ -200,28 +228,28 @@ export async function mountCLI(
   /**
    * Connects terminal streams to the Wasmer instance
    */
-  function connectStreams(instance: Instance, term: Terminal) : () => void {
+  function connectStreams(instance: Instance, term: Terminal): () => void {
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
-    
+
     // Create a single writer and keep it alive
     const stdinWriter = instance.stdin?.getWriter();
     let isDisposed = false;
-  
+
     const dataDisposable = term.onData((data: string) => {
       if (!isDisposed && stdinWriter) {
         try {
           stdinWriter.write(encoder.encode(data));
         } catch (e) {
-          console.error('Write error:', e);
+          console.error("Write error:", e);
         }
       }
     });
-  
+
     // Create persistent stream handlers
     let stdoutController: AbortController | null = new AbortController();
     let stderrController: AbortController | null = new AbortController();
-  
+
     // Handle stdout with abort signal
     (async () => {
       try {
@@ -231,7 +259,7 @@ export async function mountCLI(
             while (true) {
               const { done, value } = await reader.read();
               if (done || isDisposed) break;
-              
+
               const text = decoder.decode(value);
               if (text.includes("\x1B]1337;Custom=1\x07")) {
                 scrollToFrontend();
@@ -244,10 +272,10 @@ export async function mountCLI(
           }
         }
       } catch (e) {
-        console.error('Stdout error:', e);
+        console.error("Stdout error:", e);
       }
     })();
-  
+
     // Handle stderr with abort signal
     (async () => {
       try {
@@ -264,27 +292,27 @@ export async function mountCLI(
           }
         }
       } catch (e) {
-        console.error('Stderr error:', e);
+        console.error("Stderr error:", e);
       }
     })();
-  
+
     return () => {
       isDisposed = true;
       dataDisposable.dispose();
-      
+
       if (stdinWriter) {
         try {
           stdinWriter.releaseLock();
         } catch (e) {
-          console.error('Stdin cleanup error:', e);
+          console.error("Stdin cleanup error:", e);
         }
       }
-  
+
       if (stdoutController) {
         stdoutController.abort();
         stdoutController = null;
       }
-  
+
       if (stderrController) {
         stderrController.abort();
         stderrController = null;
