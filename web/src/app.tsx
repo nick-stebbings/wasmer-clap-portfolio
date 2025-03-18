@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useEffect, useRef } from 'preact/hooks'
 import './app.css'
 import { mountCLI } from './wasm/mount-cli';
 
@@ -6,44 +6,58 @@ import { mountCLI } from './wasm/mount-cli';
 
 export function App() {
   const container = useRef(null);
-  const [isMounted, setIsMounted] = useState(false);
   const monitorElementClass = 'framer-14kpxdk';
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    let intervalId;
-    const checkAndMountCLI = () => {
-      const existingTerminal = document.querySelector(`.${monitorElementClass}`);
-      if (!existingTerminal || isMounted) return;
+    let mounted = false;
 
-      mountCLI(existingTerminal as HTMLElement, () => {
-        window.location.hash = 'work';
-      })
-      .then((cleanup) => {
-        const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
-        if (viewport) {
-          viewport.click();
-          const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLElement;
-          if (terminalElement) {
-            terminalElement.focus();
+    const checkAndMountCLI = async () => {
+      const existingTerminal = document.querySelector(`.${monitorElementClass}`);
+      if (!existingTerminal || mounted) return;
+
+      try {
+        mounted = true;
+        const cleanup = await mountCLI(existingTerminal as HTMLElement, () => {
+          window.location.hash = 'work';
+        });
+
+        if (cleanup && typeof cleanup === 'function') {
+          cleanupRef.current = cleanup;
+          
+          const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
+          if (viewport) {
+            viewport.click();
+            const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLElement;
+            if (terminalElement) {
+              terminalElement.focus();
+            }
           }
+          mounted = true;
+        } else {
+          console.error("Invalid cleanup function");
+          mounted = true;
         }
-        setIsMounted(true);
-        if(!cleanup || typeof cleanup !== 'function') {
-          console.error("Could not cleanup");
-        }
-        cleanup!()
-      })
-      .catch((error) => {
-        console.error("Wasm CLI would not mount:", error);
-        setIsMounted(true);
-      });
+      } catch (error) {
+        console.error("Wasm CLI mount error:", error);
+        mounted = false;
+      }
     };
 
-    intervalId = setInterval(checkAndMountCLI, 500);
+    const intervalId = setInterval(checkAndMountCLI, 500);
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [isMounted]);
+    return () => {
+      clearInterval(intervalId);
+      if (cleanupRef.current) {
+        try {
+          cleanupRef.current();
+          cleanupRef.current = null;
+        } catch (e) {
+          console.error("Cleanup error:", e);
+        }
+      }
+    };
+  }, []);
 
   return (
     <div ref={container}>
