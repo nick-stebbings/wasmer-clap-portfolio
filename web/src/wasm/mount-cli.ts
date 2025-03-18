@@ -129,7 +129,7 @@ export async function mountCLI(
       wasmerInitialized = true;
     } catch (e) {
       console.error("Wasmer init failed:", e);
-      term.writeln(`\x1b[31mFailed to initialize Wasmer: ${e.message}\x1b[0m`);
+      term.writeln(`\x1b[31mFailed to initialize Wasmer: ${(e as any).message}\x1b[0m`);
       return;
     }
   }
