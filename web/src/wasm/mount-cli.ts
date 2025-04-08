@@ -16,62 +16,63 @@ const TERM_SETTINGS = {
 };
 
 const TERM_PACKAGE = "sharrattj/bash";
-  const projectsYaml = `
-  item2_projects:
-    - name: "FrontEnd stub"
-      description: "FrontEnd stub"
-      technologies: ["FrontEnd stub"]
-      github_url: "https://github.com/user/FrontEnd"
-      highlights: 
-        - "Stub Client"
-  
-  item1_projects:
-    - name: "Node APIs"
-      description: "I've contributed multiple times to RESTful APIs using JS / TypeScript that were deployed to production applications."
-      technologies: ["Express.js", "Node.js", "Bun", "Caprover", "Docker"]
-      highlights: 
-        - "Inkibra Ltd. (Freelance)"
-        - "Whites Powersports AU/NZ (at Y5 Labs)"
-  
-    - name: "Rust peer-to-peer APIs"
-      description: "Writing and unit testing Holochain dApp endpoints"
-      technologies: ["Rust", "Holochain", "Tryorama (testing)"]
-      github_url: "https://github.com/HabFract/planitt/tree/main/tests"
-      highlights: 
-        - "Neighbourhoods"
-        - "zkCATS"
-        - "Planitt (Side Project)"
-  
-    - name: "Ruby APIs"
-      description: "Writing a RESTful API for personal habit data"
-      technologies: ["Sinatra", "dry-rb", "Rack frameworks"]
-      github_url: "https://github.com/nick-stebbings/fractal-habit-pyramid-sinatraAPI"
-      highlights: 
-        - "Habit/Fract v1 (Side Project)"
-  
-    - name: "Zero Knowledge Proofs"
-      description: "Studying Rust implementations of ZKPs"
-      technologies: ["ZKP", "artworks-rs", "Elliptic curve cryptography", "Blockchain L2 Rollups"]
-      github_url: "https://github.com/nick-stebbings/zkCATS"
-      highlights: 
-        - "None.. yet ;)"
-  
-  item3_projects:
-    - name: "FrontEnd stub"
-      description: "FrontEnd stub"
-      technologies: ["FrontEnd stub"]
-      github_url: "https://github.com/user/FrontEnd"
-      highlights: 
-        - "Stub Client"
-  
-  item4_projects:
-    - name: "FrontEnd stub"
-      description: "FrontEnd stub"
-      technologies: ["FrontEnd stub"]
-      github_url: "https://github.com/user/FrontEnd"
-      highlights: 
-        - "Stub Client"
-  `;
+
+const PROJECTS_YAML = `
+item2_projects:
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    highlights: 
+      - "Stub Client"
+
+item1_projects:
+  - name: "Node APIs"
+    description: "I've contributed multiple times to RESTful APIs using JS / TypeScript that were deployed to production applications."
+    technologies: ["Express.js", "Node.js", "Bun", "Caprover", "Docker"]
+    highlights: 
+      - "Inkibra Ltd. (Freelance)"
+      - "Whites Powersports AU/NZ (at Y5 Labs)"
+
+  - name: "Rust peer-to-peer APIs"
+    description: "Writing and unit testing Holochain dApp endpoints"
+    technologies: ["Rust", "Holochain", "Tryorama (testing)"]
+    github_url: "https://github.com/HabFract/planitt/tree/main/tests"
+    highlights: 
+      - "Neighbourhoods"
+      - "zkCATS"
+      - "Planitt (Side Project)"
+
+  - name: "Ruby APIs"
+    description: "Writing a RESTful API for personal habit data"
+    technologies: ["Sinatra", "dry-rb", "Rack frameworks"]
+    github_url: "https://github.com/nick-stebbings/fractal-habit-pyramid-sinatraAPI"
+    highlights: 
+      - "Habit/Fract v1 (Side Project)"
+
+  - name: "Zero Knowledge Proofs"
+    description: "Studying Rust implementations of ZKPs"
+    technologies: ["ZKP", "artworks-rs", "Elliptic curve cryptography", "Blockchain L2 Rollups"]
+    github_url: "https://github.com/nick-stebbings/zkCATS"
+    highlights: 
+      - "None.. yet ;)"
+
+item3_projects:
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    highlights: 
+      - "Stub Client"
+
+item4_projects:
+  - name: "FrontEnd stub"
+    description: "FrontEnd stub"
+    technologies: ["FrontEnd stub"]
+    github_url: "https://github.com/user/FrontEnd"
+    highlights: 
+      - "Stub Client"
+`;
 
   export async function mountCLI(container: HTMLElement, onFrontendSelect?: () => void) {
   if (!container) return;
@@ -100,16 +101,18 @@ const TERM_PACKAGE = "sharrattj/bash";
     
     const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
     const portfolioWasmBinary = await fetch(WASM_URL, {
+      method: 'GET',
       headers: { 
         'Accept': 'application/wasm',
-        'Content-Type': 'application/wasm'
+        'Content-Type': 'application/wasm',
+        mode: 'cors'
       }
     }).then(async r => new Uint8Array(await r.arrayBuffer()));
 
     const home = new Directory();
     const bin = new Directory();
     await Promise.all([
-      home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
+      home.writeFile("projects.yaml", new TextEncoder().encode(PROJECTS_YAML)),
       bin.writeFile("projects", portfolioWasmBinary)
     ]);      
 
