@@ -7,7 +7,7 @@ import portfolioWasmUrl from "/portfolio.wasm?url";
 const TERM_SETTINGS = {
   cursorBlink: true,
   convertEol: true,
-  rows: window.innerWidth < 768 ? 12 : 24,
+  rows: window.innerWidth < 768 ? 8 : 24,
   cols: window.innerWidth < 768 ? 40 : 80,
   fontFamily: 'MesloLGS NF, Menlo, Monaco, "Courier New", monospace',
   fontSize: window.innerWidth < 768 ? 12 : 14,
@@ -112,52 +112,33 @@ const TERM_PACKAGE = "sharrattj/bash";
       bin.writeFile("projects", portfolioWasmBinary)
     ]);      
 
-    const initInstance = async () => {
-      const instance = await pkg.entrypoint?.run({
-        args: ["-c", "/usr/local/bin/projects"],
-        uses: [],
-        mount: { "/home": home, "/usr/local/bin": bin },
-        cwd: "/home",
-        env: {
-          TERM: "xterm-256color",
-          HOME: "/home",
-          PATH: "/usr/local/bin:/usr/bin:/bin",
-          PS1: "Guest> ",
-        },
-      });
+    const instance = await pkg.entrypoint?.run({
+      args: ["-c", "/usr/local/bin/projects"],
+      uses: [],
+      mount: { "/home": home, "/usr/local/bin": bin },
+      cwd: "/home",
+      env: {
+        TERM: "xterm-256color",
+        HOME: "/home",
+        PATH: "/usr/local/bin:/usr/bin:/bin",
+        PS1: "Guest> ",
+      },
+    });
 
-      if (!instance) throw new Error("Failed to create WASM instance");
-      return instance;
-    };
-
-    let instance = await initInstance();
-
+    if (!instance) throw new Error("Failed to create WASM instance");
+    
     const encoder = new TextEncoder();
     const stdin = instance.stdin?.getWriter();
 
-    let lastInput = '';
-    let awaitingEnter = false;
-
+    let lastChar = '';
     term.onData((data) => {
       stdin?.write(encoder.encode(data));
-      
-      if (data === '2') {
-        awaitingEnter = true;
-        lastInput = '2';
-      } else if (data === '\r' && awaitingEnter && lastInput === '2' && onFrontendSelect) {
-        setTimeout(() => {
-          onFrontendSelect();
-          term.clear();
-          term.write("\x1B[!p"); // Soft reset
-          term.writeln("Welcome to my portfolio CLI!");
-          stdin?.write(encoder.encode('\r')); // Return to prompt
-        }, 100);
-        awaitingEnter = false;
-        lastInput = '';
-      } else if (data !== '\r') {
-        awaitingEnter = false;
-        lastInput = '';
+      if (data === '\r' && lastChar === '2' && onFrontendSelect) {
+        onFrontendSelect();
+        term.clear();
+        term.writeln("Welcome to my portfolio CLI!");
       }
+      lastChar = data;
     });
 
     instance.stdout.pipeTo(new WritableStream({ 
