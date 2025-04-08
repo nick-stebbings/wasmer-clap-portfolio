@@ -7,7 +7,7 @@ import portfolioWasmUrl from "/portfolio.wasm?url";
 const TERM_SETTINGS = {
   cursorBlink: true,
   convertEol: true,
-  rows: window.innerWidth < 768 ? 16 : 24,
+  rows: window.innerWidth < 768 ? 12 : 24,
   cols: window.innerWidth < 768 ? 40 : 80,
   fontFamily: 'MesloLGS NF, Menlo, Monaco, "Courier New", monospace',
   fontSize: window.innerWidth < 768 ? 12 : 14,
