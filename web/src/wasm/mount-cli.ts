@@ -135,19 +135,29 @@ const TERM_PACKAGE = "sharrattj/bash";
     const encoder = new TextEncoder();
     const stdin = instance.stdin?.getWriter();
 
+    let lastInput = '';
+    let awaitingEnter = false;
+
     term.onData((data) => {
       stdin?.write(encoder.encode(data));
-      // Simple check after writing to stdin
-      setTimeout(async () => {
-        onFrontendSelect && onFrontendSelect();
-        // Reset terminal
-        term.clear();
-        term.reset();
-        term.writeln("Welcome to my portfolio CLI!");
-        // Reinitialize instance
-        instance = await initInstance();
-        stdin?.write(encoder.encode('\n'));
-      }, 100);
+      
+      if (data === '2') {
+        awaitingEnter = true;
+        lastInput = '2';
+      } else if (data === '\r' && awaitingEnter && lastInput === '2' && onFrontendSelect) {
+        setTimeout(() => {
+          onFrontendSelect();
+          term.clear();
+          term.write("\x1B[!p"); // Soft reset
+          term.writeln("Welcome to my portfolio CLI!");
+          stdin?.write(encoder.encode('\r')); // Return to prompt
+        }, 100);
+        awaitingEnter = false;
+        lastInput = '';
+      } else if (data !== '\r') {
+        awaitingEnter = false;
+        lastInput = '';
+      }
     });
 
     instance.stdout.pipeTo(new WritableStream({ 
