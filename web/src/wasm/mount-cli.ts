@@ -142,7 +142,15 @@ const TERM_PACKAGE = "sharrattj/bash";
     });
 
     instance.stdout.pipeTo(new WritableStream({ 
-      write: (chunk) => term.write(chunk) 
+      write: (chunk) => {
+        const text = new TextDecoder().decode(chunk);
+        if (text.includes("\x1B]1337;Custom=1\x07") && onFrontendSelect) {
+          onFrontendSelect();
+          term.clear();
+          term.writeln("Welcome to my portfolio CLI!");
+        }
+        term.write(chunk);
+      }
     }));
     instance.stderr.pipeTo(new WritableStream({ 
       write: (chunk) => term.write(chunk) 

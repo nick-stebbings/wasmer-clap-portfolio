@@ -56,9 +56,19 @@ body {
   left: -10px;
 }
 
+// Terminal screen size
+.framer-14kpxdk {
+  max-height: 30vh;
+}
+
 @media only screen and (min-width: 768px) {
   .framer-XTjJ3 {
     overflow: hidden !important;
+  }
+
+  // Terminal screen size
+  .framer-14kpxdk {
+    max-height: 60vh;
   }
   /* Card tech labels */
   .framer-1f6tag0 p span {
