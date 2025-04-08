@@ -56,6 +56,30 @@ body {
   left: -10px;
 }
 
+// Explainer for WASI
+.framer-1faus20 {
+  position: relative;
+  right: 80px;
+}
+.framer-1haburu, .framer-1haburu .framer-text  {
+  max-width: 80vw;
+}
+/* Explainer for WASI diagram hint */
+.framer-1faus20 {
+  position: relative;
+}
+.framer-1faus20::after {
+  content: "Scroll Right for Diagram --> ";
+  display: block;
+  color: black;
+  font-size: 1rem;
+  margin-top: 8px;
+  text-align: center;
+  top: 16px;
+  position: relative;
+  left: 16px;
+}
+
 // Terminal screen size
 .framer-14kpxdk {
   max-height: 30vh;
@@ -64,6 +88,17 @@ body {
 @media only screen and (min-width: 768px) {
   .framer-XTjJ3 {
     overflow: hidden !important;
+  }
+
+  // Explainer for WASI
+  .framer-1faus20 {
+    right: initial;
+  }
+  .framer-1haburu, .framer-1haburu .framer-text  {
+    max-width: initial;
+  }
+  .framer-1faus20::after {
+    content: '';
   }
 
   // Terminal screen size
