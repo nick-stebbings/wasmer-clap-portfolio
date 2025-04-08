@@ -94,8 +94,6 @@ item4_projects:
     fit.fit();
 
     if (window.innerWidth < 768) {
-      container.style.height = '60vh';
-      container.style.maxWidth = '100vw';
       term.resize(TERM_SETTINGS.cols, TERM_SETTINGS.rows);
     }
     

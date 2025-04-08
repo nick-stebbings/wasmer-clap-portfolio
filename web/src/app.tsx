@@ -18,9 +18,7 @@ export function App() {
 
       try {
         mounted = true;
-        await mountCLI(existingTerminal as HTMLElement, () => {
-          window.location.hash = 'work';
-        });
+        await mountCLI(existingTerminal as HTMLElement,);
       } catch (error) {
         console.error("Wasm CLI mount error:", error);
         mounted = false;
