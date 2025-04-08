@@ -127,9 +127,13 @@ item4_projects:
     });
 
     if (!instance) throw new Error("Failed to create WASM instance");
-    
+    term.onKey(({ key }) => {
+      if (!!onFrontendSelect && key === '0') {
+        onFrontendSelect()
+      }
+    });
 
-    connectStreams(instance, term, onFrontendSelect);
+    connectStreams(instance, term);
 
     instance.stdout.pipeTo(new WritableStream({ 
       write: (chunk) => term.write(chunk) 
@@ -143,24 +147,10 @@ item4_projects:
   }
 }
 
-function connectStreams(instance: Instance, term: Terminal, onFrontendSelect?: () => void): void {
+function connectStreams(instance: Instance, term: Terminal): void {
   const encoder = new TextEncoder();
   const stdin = instance.stdin?.getWriter();
   term.onData((data) => stdin?.write(encoder.encode(data)));
-  
-  instance.stdout.pipeTo(new WritableStream({ 
-    write: (chunk) => {
-      const text = new TextDecoder().decode(chunk);
-      if (text.includes("\x1B]1337;Custom=1\x07") && onFrontendSelect) {
-        onFrontendSelect();
-        term.clear();
-        term.writeln("Welcome to my portfolio CLI!");
-      }
-      term.write(chunk);
-    }
-  }));
-  
-  instance.stderr.pipeTo(new WritableStream({ 
-    write: (chunk) => term.write(chunk) 
-  }));
+  instance.stdout.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
+  instance.stderr.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
 }
