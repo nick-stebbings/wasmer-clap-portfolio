@@ -130,6 +130,9 @@ item4_projects:
     term.onKey(({ key }) => {
       if (!!onFrontendSelect && key === '0') {
         onFrontendSelect()
+        term.clear();
+        term.write("\x1B[!p"); // Soft reset
+        term.writeln("Welcome to my portfolio CLI!");
       }
     });
 
