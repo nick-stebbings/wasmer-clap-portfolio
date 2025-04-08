@@ -2,7 +2,8 @@ import "@xterm/xterm/css/xterm.css";
 import { Directory } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
-import portfolioWasmUrl from "/portfolio.wasm?url";
+
+const WASM_URL = 'https://nick-stebbings-portfolio-assets.b-cdn.net/portfolio.wasm';
 
 const TERM_SETTINGS = {
   cursorBlink: true,
@@ -98,7 +99,7 @@ const TERM_PACKAGE = "sharrattj/bash";
     }
     
     const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
-    const portfolioWasmBinary = await fetch(portfolioWasmUrl, {
+    const portfolioWasmBinary = await fetch(WASM_URL, {
       headers: { 
         'Accept': 'application/wasm',
         'Content-Type': 'application/wasm'
