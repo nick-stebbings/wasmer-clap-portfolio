@@ -8,7 +8,7 @@ const WASM_URL = 'https://nick-stebbings-portfolio-assets.b-cdn.net/portfolio.wa
 const TERM_SETTINGS = {
   cursorBlink: true,
   convertEol: true,
-  rows: window.innerWidth < 768 ? 8 : 24,
+  rows: window.innerWidth < 768 ? 16 : 24,
   cols: window.innerWidth < 768 ? 40 : 80,
   fontFamily: 'MesloLGS NF, Menlo, Monaco, "Courier New", monospace',
   fontSize: window.innerWidth < 768 ? 12 : 14,
