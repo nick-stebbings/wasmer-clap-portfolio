@@ -83,7 +83,12 @@ body {
 
 // Terminal screen size
 .framer-14kpxdk {
-  max-height: 30vh !important;
+  height: 30vh !important;
+}
+
+.framer-k8hwpq {
+  position: relative !important;
+  left: -4rem !important;
 }
 
 @media only screen and (min-width: 768px) {
@@ -101,10 +106,13 @@ body {
   .framer-1faus20::after {
     content: '' !important;
   }
+  .framer-k8hwpq {
+    left: initial !important;
+  }
 
   // Terminal screen size
   .framer-14kpxdk {
-    max-height: 60vh !important;
+    height: 60vh !important;
   }
 
   /* Card tech labels */
