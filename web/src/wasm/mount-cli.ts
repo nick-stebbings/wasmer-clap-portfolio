@@ -126,7 +126,7 @@ const TERM_PACKAGE = "sharrattj/bash";
     });
 
     if (!instance) throw new Error("Failed to create WASM instance");
-    connectStreams(instance, term);
+    connectStreams(instance, term, onFrontendSelect);
 
   } catch (error) {
     console.error("CLI mount error:", error);
