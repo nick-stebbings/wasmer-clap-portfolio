@@ -14,3 +14,9 @@
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Resource-Policy = "cross-origin"
     Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "cross-site"
+    Content-Security-Policy = "frame-ancestors https://widgets.commoninja.com"
