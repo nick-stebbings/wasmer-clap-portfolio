@@ -112,40 +112,53 @@ const TERM_PACKAGE = "sharrattj/bash";
       bin.writeFile("projects", portfolioWasmBinary)
     ]);      
 
-    const instance = await pkg.entrypoint?.run({
-      args: ["-c", "/usr/local/bin/projects"],
-      uses: [],
-      mount: { "/home": home, "/usr/local/bin": bin },
-      cwd: "/home",
-      env: {
-        TERM: "xterm-256color",
-        HOME: "/home",
-        PATH: "/usr/local/bin:/usr/bin:/bin",
-        PS1: "Guest> ",
-      },
-    });
+    const initInstance = async () => {
+      const instance = await pkg.entrypoint?.run({
+        args: ["-c", "/usr/local/bin/projects"],
+        uses: [],
+        mount: { "/home": home, "/usr/local/bin": bin },
+        cwd: "/home",
+        env: {
+          TERM: "xterm-256color",
+          HOME: "/home",
+          PATH: "/usr/local/bin:/usr/bin:/bin",
+          PS1: "Guest> ",
+        },
+      });
+
+      if (!instance) throw new Error("Failed to create WASM instance");
+      return instance;
+    };
+
+    let instance = await initInstance();
 
     if (!instance) throw new Error("Failed to create WASM instance");
-    connectStreams(instance, term, onFrontendSelect);
+    const encoder = new TextEncoder();
+    const stdin = instance.stdin?.getWriter();
 
+    term.onData((data) => {
+      stdin?.write(encoder.encode(data));
+      // Simple check after writing to stdin
+      setTimeout(async () => {
+        onFrontendSelect && onFrontendSelect();
+        // Reset terminal
+        term.clear();
+        term.reset();
+        term.writeln("Welcome to my portfolio CLI!");
+        // Reinitialize instance
+        instance = await initInstance();
+        stdin?.write(encoder.encode('\n'));
+      }, 100);
+    });
+
+    instance.stdout.pipeTo(new WritableStream({ 
+      write: (chunk) => term.write(chunk) 
+    }));
+    instance.stderr.pipeTo(new WritableStream({ 
+      write: (chunk) => term.write(chunk) 
+    }));
   } catch (error) {
     console.error("CLI mount error:", error);
     term.writeln(`\x1b[31mError: ${(error as Error).message}\x1b[0m`);
   }
-}
-
-
-function connectStreams(instance: Instance, term: Terminal, onFrontendSelect?: () => void): void {
-  const encoder = new TextEncoder();
-  const stdin = instance.stdin?.getWriter();
-  
-  term.onData((data) => {
-    if (data === '2' && onFrontendSelect) {
-      onFrontendSelect();
-    }
-    stdin?.write(encoder.encode(data));
-  });
-
-  instance.stdout.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
-  instance.stderr.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
 }
