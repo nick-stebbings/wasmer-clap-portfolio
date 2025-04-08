@@ -25,7 +25,7 @@ impl std::fmt::Display for MenuList {
         // Use explicit white() for commands
         let prompt = format!(
             "Press {} to view category, {} to quit",
-            "1-4".white().bold(),
+            "0-4".white().bold(),
             "q".white().bold()
         );
 
@@ -110,7 +110,11 @@ fn show_projects(category: u8) {
         _ => &config().item1_projects,
     };
 
-    let title = format!("Category {} Projects", category);
+    let title: String = match category {
+        1 => "Back End Projects".to_string(),
+        _ => "".to_string()
+    };
+
     let menu_items = projects
         .iter()
         .enumerate()

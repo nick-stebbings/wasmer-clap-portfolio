@@ -1,5 +1,5 @@
 import "@xterm/xterm/css/xterm.css";
-import { Directory } from "@wasmer/sdk";
+import { Directory, Instance } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 
@@ -128,19 +128,8 @@ item4_projects:
 
     if (!instance) throw new Error("Failed to create WASM instance");
     
-    const encoder = new TextEncoder();
-    const stdin = instance.stdin?.getWriter();
 
-    let lastChar = '';
-    term.onData((data) => {
-      stdin?.write(encoder.encode(data));
-      if (data === '\r' && lastChar === '0' && onFrontendSelect) {
-        onFrontendSelect();
-        term.clear();
-        term.writeln("Welcome to my portfolio CLI!");
-      }
-      lastChar = data;
-    });
+    connectStreams(instance, term, onFrontendSelect);
 
     instance.stdout.pipeTo(new WritableStream({ 
       write: (chunk) => term.write(chunk) 
@@ -152,4 +141,26 @@ item4_projects:
     console.error("CLI mount error:", error);
     term.writeln(`\x1b[31mError: ${(error as Error).message}\x1b[0m`);
   }
+}
+
+function connectStreams(instance: Instance, term: Terminal, onFrontendSelect?: () => void): void {
+  const encoder = new TextEncoder();
+  const stdin = instance.stdin?.getWriter();
+  term.onData((data) => stdin?.write(encoder.encode(data)));
+  
+  instance.stdout.pipeTo(new WritableStream({ 
+    write: (chunk) => {
+      const text = new TextDecoder().decode(chunk);
+      if (text.includes("\x1B]1337;Custom=1\x07") && onFrontendSelect) {
+        onFrontendSelect();
+        term.clear();
+        term.writeln("Welcome to my portfolio CLI!");
+      }
+      term.write(chunk);
+    }
+  }));
+  
+  instance.stderr.pipeTo(new WritableStream({ 
+    write: (chunk) => term.write(chunk) 
+  }));
 }
