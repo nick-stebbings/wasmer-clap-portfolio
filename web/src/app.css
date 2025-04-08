@@ -82,7 +82,7 @@ body {
 }
 
 // Terminal screen size
-.framer-14kpxdk {
+.framer-14kpxdk, .framer-VLQog .framer-14kpxdk {
   height: 30vh !important;
 }
 
@@ -111,7 +111,7 @@ body {
   }
 
   // Terminal screen size
-  .framer-14kpxdk {
+  .framer-14kpxdk, .framer-VLQog .framer-14kpxdk {
     height: 60vh !important;
   }
 

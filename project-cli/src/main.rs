@@ -79,12 +79,12 @@ fn show_menu() {
         title: "Portfolio Projects".into(),
         items: vec![
             MenuItem {
-                number: '1',
-                text: "Back End Projects".into(),
+                number: '0',
+                text: "Front End Projects".into(),
             },
             MenuItem {
-                number: '2',
-                text: "Front End Projects".into(),
+                number: '1',
+                text: "Back End Projects".into(),
             },
         ],
     };
@@ -96,12 +96,6 @@ fn show_menu() {
     let choice = get_single_char();
     match choice {
         '1' => show_projects(choice.to_digit(10).unwrap_or(1) as u8),
-        '2' => {
-            // Send custom escape sequence to be handled by front-end
-            print!("\x1B]1337;Custom=1\x07");
-            io::stdout().flush().unwrap();
-            show_menu();
-        }
         'q' => quit(),
         _ => show_menu(),
     }
