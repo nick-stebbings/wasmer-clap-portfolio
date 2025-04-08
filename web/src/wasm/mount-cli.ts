@@ -1,5 +1,5 @@
 import "@xterm/xterm/css/xterm.css";
-import { Directory, type Instance } from "@wasmer/sdk";
+import { Directory } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import portfolioWasmUrl from "/portfolio.wasm?url";
@@ -132,7 +132,6 @@ const TERM_PACKAGE = "sharrattj/bash";
 
     let instance = await initInstance();
 
-    if (!instance) throw new Error("Failed to create WASM instance");
     const encoder = new TextEncoder();
     const stdin = instance.stdin?.getWriter();
 
