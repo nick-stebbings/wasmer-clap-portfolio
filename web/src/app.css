@@ -58,31 +58,32 @@ body {
 
 // Explainer for WASI
 .framer-1faus20 {
-  position: relative;
-  right: 80px;
+  position: relative !important;
+  right: 80px !important;
 }
 .framer-1haburu, .framer-1haburu .framer-text  {
-  max-width: 80vw;
+  max-width: 80vw !important;
 }
 /* Explainer for WASI diagram hint */
 .framer-1faus20 {
-  position: relative;
+  position: relative !important;
 }
 .framer-1faus20::after {
   content: "Scroll Right for Diagram --> ";
   display: block;
   color: black;
-  font-size: 1rem;
+  font-size: 0.75rem;
   margin-top: 8px;
   text-align: center;
-  top: 16px;
+  top: 3rem;
   position: relative;
-  left: 16px;
+  left: -50%;
+  width: 100vw;
 }
 
 // Terminal screen size
 .framer-14kpxdk {
-  max-height: 30vh;
+  max-height: 30vh !important;
 }
 
 @media only screen and (min-width: 768px) {
@@ -92,19 +93,20 @@ body {
 
   // Explainer for WASI
   .framer-1faus20 {
-    right: initial;
+    right: initial !important;
   }
   .framer-1haburu, .framer-1haburu .framer-text  {
-    max-width: initial;
+    max-width: initial !important;
   }
   .framer-1faus20::after {
-    content: '';
+    content: '' !important;
   }
 
   // Terminal screen size
   .framer-14kpxdk {
-    max-height: 60vh;
+    max-height: 60vh !important;
   }
+
   /* Card tech labels */
   .framer-1f6tag0 p span {
     font-size: 22px !important;
