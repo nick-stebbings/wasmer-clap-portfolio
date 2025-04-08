@@ -105,7 +105,6 @@ item4_projects:
       headers: { 
         'Accept': 'application/wasm',
         'Content-Type': 'application/wasm',
-        mode: 'cors'
       }
     }).then(async r => new Uint8Array(await r.arrayBuffer()));
 
