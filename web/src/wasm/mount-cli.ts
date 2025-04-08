@@ -72,7 +72,7 @@ const TERM_PACKAGE = "sharrattj/bash";
         - "Stub Client"
   `;
 
-export async function mountCLI(container: HTMLElement) {
+  export async function mountCLI(container: HTMLElement, onFrontendSelect?: () => void) {
   if (!container) return;
   
   const term = new Terminal(TERM_SETTINGS);
@@ -134,10 +134,18 @@ export async function mountCLI(container: HTMLElement) {
   }
 }
 
-function connectStreams(instance: Instance, term: Terminal): void {
+
+function connectStreams(instance: Instance, term: Terminal, onFrontendSelect?: () => void): void {
   const encoder = new TextEncoder();
   const stdin = instance.stdin?.getWriter();
-  term.onData((data) => stdin?.write(encoder.encode(data)));
+  
+  term.onData((data) => {
+    if (data === '2' && onFrontendSelect) {
+      onFrontendSelect();
+    }
+    stdin?.write(encoder.encode(data));
+  });
+
   instance.stdout.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
   instance.stderr.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
 }

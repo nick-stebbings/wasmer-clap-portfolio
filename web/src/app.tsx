@@ -18,24 +18,9 @@ export function App() {
 
       try {
         mounted = true;
-        await mountCLI(existingTerminal as HTMLElement,);
-
-        // if (cleanup && typeof cleanup === 'function') {
-        //   cleanupRef.current = cleanup;
-          
-        //   const viewport = existingTerminal.querySelector('.xterm-viewport') as HTMLElement;
-        //   if (viewport) {
-        //     viewport.click();
-        //     const terminalElement = existingTerminal.querySelector('.xterm-helper-textarea') as HTMLElement;
-        //     if (terminalElement) {
-        //       terminalElement.focus();
-        //     }
-        //   }
-        //   mounted = true;
-        // } else {
-        //   console.error("Invalid cleanup function");
-        //   mounted = true;
-        // }
+        await mountCLI(existingTerminal as HTMLElement, () => {
+          window.location.hash = 'work';
+        });
       } catch (error) {
         console.error("Wasm CLI mount error:", error);
         mounted = false;
