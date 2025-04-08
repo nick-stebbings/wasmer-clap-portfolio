@@ -1,5 +1,4 @@
 import "@xterm/xterm/css/xterm.css";
-
 import { Directory, type Instance } from "@wasmer/sdk";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
@@ -8,52 +7,14 @@ import portfolioWasmUrl from "/portfolio.wasm?url";
 const TERM_SETTINGS = {
   cursorBlink: true,
   convertEol: true,
-  rows: 24,
-  cols: 80,
+  rows: window.innerWidth < 768 ? 16 : 24,
+  cols: window.innerWidth < 768 ? 40 : 80,
   fontFamily: 'MesloLGS NF, Menlo, Monaco, "Courier New", monospace',
-  fontSize: 14,
+  fontSize: window.innerWidth < 768 ? 12 : 14,
+  scrollback: 1000,
 };
+
 const TERM_PACKAGE = "sharrattj/bash";
-
-let wasmerInitialized = false;
-
-class TerminalSingleton {
-  terminal?: typeof Terminal.prototype | null;
-  static instance: TerminalSingleton;
-
-  constructor() {
-    if (!TerminalSingleton.instance) {
-      this.terminal = null;
-      TerminalSingleton.instance = this;
-    }
-    return TerminalSingleton.instance;
-  }
-
-  getInstance() {
-    if (!this.terminal) {
-      this.terminal = new Terminal(); // Replace with your terminal initialization
-    }
-    return this.terminal;
-  }
-
-  open(containerId: string) {
-    if (this.terminal) {
-      this.terminal.open(document.getElementById(containerId) as HTMLElement);
-    }
-  }
-}
-
-const instance = new TerminalSingleton();
-Object.freeze(instance);
-
-// Check for mobile device
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-export async function mountCLI(
-  container: HTMLElement,
-  scrollToFrontend: () => void
-) {
-  // Write projects.yaml to home directory (needed for local)
   const projectsYaml = `
   item2_projects:
     - name: "FrontEnd stub"
@@ -110,88 +71,51 @@ export async function mountCLI(
       highlights: 
         - "Stub Client"
   `;
-  if (!container) return;
 
+export async function mountCLI(container: HTMLElement) {
+  if (!container) return;
+  
   const term = new Terminal(TERM_SETTINGS);
   const fit = new FitAddon();
-  term.writeln("Welcome to my portfolio terminal!");
-  term.attachCustomWheelEventHandler((_ev: WheelEvent) => false);
-
-  // Initialize terminal first
-  term.loadAddon(fit);
-  term.open(container);
-  fit.fit();
-
-  let cleanup: (() => void) | null = null;
-  let wasmerInstance: Instance | undefined;
-
-  if (!wasmerInitialized) {
-    term.writeln("Initializing...");
-
-    try {
-      const initPromise = import("@wasmer/sdk").then(({ init }) => {
-        term.writeln("Loading WASM runtime...");
-        return init();
-      });
-
-      // Set timeout especially for mobile
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(
-          () => reject(new Error("Loading timeout")),
-          isMobile ? 15000 : 5000
-        );
-      });
-
-      await Promise.race([initPromise, timeoutPromise]).catch((e) => {
-        if (e.message === "Loading timeout") {
-          throw new Error(
-            "Loading timed out. Please try on desktop, or check your connection."
-          );
-        }
-        throw e;
-      });
-      wasmerInitialized = true;
-    } catch (e) {
-      console.error("Wasmer init failed:", e);
-      term.writeln(
-        `\x1b[31mFailed to initialize Wasmer: ${(e as any).message}\x1b[0m`
-      );
-      return;
-    }
-  }
+  term.writeln("Welcome to my portfolio CLI!");
+  
   try {
+    const { Wasmer, init, initializeLogger } = await import("@wasmer/sdk");
     term.writeln("Loading...");
-    const { Wasmer } = await import("@wasmer/sdk");
-    const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
-    if (!pkg) throw new Error("Failed to load bash package");
+    await init().catch(e => {
+      console.error("Wasmer init failed:", e);
+      return;
+    });
+    initializeLogger('warn');
+    term.loadAddon(fit);
+    term.open(container);
+    fit.fit();
 
+    if (window.innerWidth < 768) {
+      container.style.height = '60vh';
+      container.style.maxWidth = '100vw';
+      term.resize(TERM_SETTINGS.cols, TERM_SETTINGS.rows);
+    }
+    
+    const pkg = await Wasmer.fromRegistry(TERM_PACKAGE);
     const portfolioWasmBinary = await fetch(portfolioWasmUrl, {
-      headers: {
-        Accept: "application/wasm",
-        "Content-Type": "application/wasm",
-      },
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error(`Failed to fetch WASM: ${r.status}`);
-        return r.arrayBuffer();
-      })
-      .then((buffer) => new Uint8Array(buffer));
+      headers: { 
+        'Accept': 'application/wasm',
+        'Content-Type': 'application/wasm'
+      }
+    }).then(async r => new Uint8Array(await r.arrayBuffer()));
 
     const home = new Directory();
     const bin = new Directory();
-
     await Promise.all([
       home.writeFile("projects.yaml", new TextEncoder().encode(projectsYaml)),
-      bin.writeFile("projects", portfolioWasmBinary),
-    ]);
+      bin.writeFile("projects", portfolioWasmBinary)
+    ]);      
 
-    wasmerInstance = await pkg.entrypoint?.run({
+    const instance = await pkg.entrypoint?.run({
       args: ["-c", "/usr/local/bin/projects"],
       uses: [],
-      mount: {
-        "/home": home,
-        "/usr/local/bin": bin,
-      },
+      mount: { "/home": home, "/usr/local/bin": bin },
       cwd: "/home",
       env: {
         TERM: "xterm-256color",
@@ -201,122 +125,19 @@ export async function mountCLI(
       },
     });
 
-    if (!wasmerInstance) throw new Error("Failed to create WASM instance");
+    if (!instance) throw new Error("Failed to create WASM instance");
+    connectStreams(instance, term);
 
-    cleanup = connectStreams(wasmerInstance, term);
-
-    return () => {
-      try {
-        if (cleanup) {
-          cleanup();
-          cleanup = null;
-        }
-        if (wasmerInstance) {
-          wasmerInstance = undefined;
-        }
-        term.dispose();
-      } catch (e) {
-        console.error("Cleanup error:", e);
-      }
-    };
   } catch (error) {
     console.error("CLI mount error:", error);
-    //@ts-expect-error
-    term.writeln(`\x1b[31mError: ${error.message}\x1b[0m`);
+    term.writeln(`\x1b[31mError: ${(error as Error).message}\x1b[0m`);
   }
+}
 
-  /**
-   * Connects terminal streams to the Wasmer instance
-   */
-  function connectStreams(instance: Instance, term: Terminal): () => void {
-    const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
-
-    // Create a single writer and keep it alive
-    const stdinWriter = instance.stdin?.getWriter();
-    let isDisposed = false;
-
-    const dataDisposable = term.onData((data: string) => {
-      if (!isDisposed && stdinWriter) {
-        try {
-          stdinWriter.write(encoder.encode(data));
-        } catch (e) {
-          console.error("Write error:", e);
-        }
-      }
-    });
-
-    // Create persistent stream handlers
-    let stdoutController: AbortController | null = new AbortController();
-    let stderrController: AbortController | null = new AbortController();
-
-    // Handle stdout with abort signal
-    (async () => {
-      try {
-        while (!isDisposed) {
-          const reader = instance.stdout.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done || isDisposed) break;
-
-              const text = decoder.decode(value);
-              if (text.includes("\x1B]1337;Custom=1\x07")) {
-                scrollToFrontend();
-                continue;
-              }
-              term.write(value);
-            }
-          } finally {
-            reader.releaseLock();
-          }
-        }
-      } catch (e) {
-        console.error("Stdout error:", e);
-      }
-    })();
-
-    // Handle stderr with abort signal
-    (async () => {
-      try {
-        while (!isDisposed) {
-          const reader = instance.stderr.getReader();
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done || isDisposed) break;
-              term.write(value);
-            }
-          } finally {
-            reader.releaseLock();
-          }
-        }
-      } catch (e) {
-        console.error("Stderr error:", e);
-      }
-    })();
-
-    return () => {
-      isDisposed = true;
-      dataDisposable.dispose();
-
-      if (stdinWriter) {
-        try {
-          stdinWriter.releaseLock();
-        } catch (e) {
-          console.error("Stdin cleanup error:", e);
-        }
-      }
-
-      if (stdoutController) {
-        stdoutController.abort();
-        stdoutController = null;
-      }
-
-      if (stderrController) {
-        stderrController.abort();
-        stderrController = null;
-      }
-    };
-  }
+function connectStreams(instance: Instance, term: Terminal): void {
+  const encoder = new TextEncoder();
+  const stdin = instance.stdin?.getWriter();
+  term.onData((data) => stdin?.write(encoder.encode(data)));
+  instance.stdout.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
+  instance.stderr.pipeTo(new WritableStream({ write: (chunk) => term.write(chunk) }));
 }
