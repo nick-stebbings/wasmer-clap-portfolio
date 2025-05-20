@@ -1,24 +1,27 @@
 [[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Embedder-Policy = "cross-site"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+[[headers]]
   for = "/*.wasm"
   [headers.values]
     Content-Type = "application/wasm"
     Content-Disposition = "attachment; filename=portfolio.wasm"
-    Cross-Origin-Embedder-Policy = "require-corp"
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Resource-Policy = "same-site"
 
 [[headers]]
-  for = "/medium-feed.html"
+  for = "/assets/*.wasm"
   [headers.values]
-    Cross-Origin-Embedder-Policy = "unsafe-none"
-    Cross-Origin-Opener-Policy = "unsafe-none"
-    Cross-Origin-Resource-Policy = "cross-origin"
-    Access-Control-Allow-Origin = "*"
-    Content-Security-Policy = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+    Content-Type = "application/wasm"
+    Content-Disposition = "attachment; filename=portfolio.wasm"
+[[headers]]
+  for = "/*.mjs"
+  [headers.values]
+    Content-Type = "text/javascript"
 
 [[headers]]
-  for = "/*"
+  for = "/assets/*.mjs"
   [headers.values]
-    Cross-Origin-Embedder-Policy = "credentialless"
-    Cross-Origin-Opener-Policy = "same-origin"
-    Cross-Origin-Resource-Policy = "cross-origin"
+    Content-Type = "text/javascript"
